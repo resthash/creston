@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creston Mining - Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<link rel="icon" type="image/png" href="favicon.png">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <span class="logo-icon">⛏️</span>
+        <span class="logo-text">Creston Mining</span>
+      </div>
+
+      <div class="menu">
+      <div class="menu-item" id="taskBtn">
+        <i class="fa-solid fa-tasks icon" ></i>
+        <span class="menu-text">Tasks</span>
+      </div>
+
+    <div class="menu-item">
+      <i class="fa-solid fa-right-left icon"></i>
+      <span class="menu-text">Swap</span>
+    </div>
+
+    <div class="menu-item active">
+      <i class="fa-solid fa-wallet icon"></i>
+      <span class="menu-text">Wallet</span>
+    </div>
+
+    <div class="menu-item">
+      <i class="fa-solid fa-cart-shopping icon"></i>
+      <span class="menu-text">Buy</span>
+    </div>
+  </div>
+
+      <div class="sidebar-bottom">
+        <button onclick="logout()" class="logout-btn">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+    <header class="top-header">
+      <div class="welcome">
+        <span class="greeting">Welcome back,</span>
+        <span class="username" id="display-username">Loading...</span>
+      </div>
+
+      <div class="header-right">
+        <div class="balance-container">
+          <div class="balance-item">
+            <span class="label">Total Balance</span>
+            <div class="amount-wrapper">
+              <span class="currency-symbol">$</span>
+              <span class="balance-usd" id="display-usd"></span>
+            </div>
+          </div>
+          <div class="task-btn"></div>
+          <div class="btc-badge">
+            <i class="fa-solid fa-coin"></i>
+            <span class="balance-btc" id="display-btc"></span>
+          </div>
+        </div>
+        </div>
+    </header>
+
+      <!-- Buy Banner -->
+      <div class="buy-banner">
+        <button onclick="buyCrypto()" class="buy-btn">Buy crypto at cheaper rate</button>
+      </div>
+
+      <!-- Crypto List -->
+      <div class="crypto-list" id="crypto-list">
+        <!-- Populated dynamically by JavaScript -->
+      </div>
+      <!-- Price Chart -->
+    </main>
+  </div>
+
+
+
+  <div id="tradeModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <div class="trade-header">
+            <h3>Live BTC/USD Flash Trade</h3>
+            <div id="tradeTimer">03:00</div>
+        </div>
+        
+        <canvas id="tradeChart"></canvas>
+
+        <div class="trade-info">
+            <p>Entry Price: <span id="entryPriceDisplay">$0.00</span></p>
+            <p>Current Price: <span id="currentPriceDisplay">$0.00</span></p>
+        </div>
+
+        <div class="trade-controls">
+            <input type="number" id="stakeAmount" placeholder="Stake Amount ($)" min="1">
+            <div class="btn-group">
+                <button id="btnHigh" class="btn-up">HIGH (Buy)</button>
+                <button id="btnLow" class="btn-down">LOW (Sell)</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAKBOMRiNdLnkctLWMrxaKX1J3_kGDYcCg",
+      authDomain: "crestonwallet.firebaseapp.com",
+      projectId: "crestonwallet",
+      storageBucket: "crestonwallet.firebasestorage.app",
+      messagingSenderId: "239942367536",
+      appId: "1:239942367536:web:a1110501538188914af0f5",
+      measurementId: "G-1VN3ZHMV01",
+      databaseURL: "https://crestonwallet-default-rtdb.firebaseio.com"
+    };
+
+    // 1. Initialize
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // 2. Auth Controller (Checks if user is logged in)
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("Authenticated:", user.uid);
+        syncUserProfile(user);
+      } else {
+        console.log("No user found, redirecting...");
+        window.location.assign("index.html");
+      }
+    });
+
+    // 3. Database Sync (Check/Create User)
+    async function syncUserProfile(user) {
+      const userRef = ref(db, 'users/' + user.uid);
+      try {
+        const snapshot = await get(userRef);
+        if (!snapshot.exists()) {
+          console.log("New user detected. Creating profile...");
+          await set(userRef, {
+            username: user.displayName || "Miner",
+            balance_usd: 0.00,
+            balance_btc: 0.00000000,
+            lastLogin: new Date().toISOString()
+          });
+        }
+        
+        // Live listener for real-time updates
+        onValue(userRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) updateDashboardUI(data);
+        });
+      } catch (error) {
+        console.error("Database Error:", error);
+      }
+    }
+
+    // 4. UI Update
+    function updateDashboardUI(data) {
+      document.getElementById('display-usd').innerText = data.balance_usd.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('display-btc').innerText = `${data.balance_btc.toFixed(8)} BTC`;
+      document.getElementById('display-username').innerText = `${data.username} 👋`;
+    }
+
+    // 5. Logout Function (Attached to Global Window for the HTML button)
+    window.logout = function() {
+      if (confirm("Logout from Creston Mining?")) {
+        signOut(auth).then(() => {
+          window.location.assign("index.html");
+        });
+      }
+    }
+  </script>
+ <script>
+    let priceChart;
+    const coins = [
+      { id: 'bitcoin', symbol: 'BTC', name: 'BITCOIN', icon: '₿', color: '#F4C542' },
+      { id: 'ethereum', symbol: 'ETH', name: 'ETHEREUM', icon: '⟠', color: '#627EEA' },
+      { id: 'tron', symbol: 'TRX', name: 'TRON', icon: '🔴', color: '#FF0018' },
+      { id: 'dogecoin', symbol: 'DOGE', name: 'DOGE', icon: '🐶', color: '#C9A14E' }
+    ];
+
+    // Fetch live prices from CoinGecko (free, no API key)
+    async function fetchCryptoPrices() {
+      try {
+        const ids = coins.map(c => c.id).join(',');
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd,ngn&include_24hr_change=true`);
+        const data = await res.json();
+
+        const container = document.getElementById('crypto-list');
+        container.innerHTML = '';
+
+        coins.forEach(coin => {
+          const priceData = data[coin.id];
+          if (!priceData) return;
+
+          const usd = priceData.usd.toLocaleString('en-US', { minimumFractionDigits: 2 });
+          const ngn = priceData.ngn.toLocaleString('en-US', { minimumFractionDigits: 0 });
+          const change = priceData.ngn_24h_change || priceData.usd_24h_change || 0;
+          const isPositive = change >= 0;
+
+          const item = document.createElement('div');
+          item.className = 'crypto-item';
+          item.innerHTML = `
+            <div class="crypto-info">
+              <span class="crypto-icon" style="color:${coin.color}">${coin.icon}</span>
+              <div>
+                <strong class="coin_name">${coin.name}</strong>
+                <small>${coin.symbol}</small>
+              </div>
+            </div>
+            <div class="crypto-prices">
+              <div class="ngn-price">₦${ngn}</div>
+              <div class="usd-price">$${usd}</div>
+              <div class="change ${isPositive ? 'positive' : 'negative'}">
+                ${isPositive ? '+' : ''}${change.toFixed(2)}%
+              </div>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      } catch (err) {
+        console.error("Price fetch error:", err);
+      }
+    }
+
+    // Fetch 7-day Bitcoin historical data for chart
+    async function fetchBtcHistory() {
+      try {
+        const res = await fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=ngn&days=7&interval=daily');
+        const data = await res.json();
+        
+        const labels = data.prices.map(p => new Date(p[0]).toLocaleDateString('en-US', {month:'short', day:'numeric'}));
+        const prices = data.prices.map(p => p[1]);
+
+        if (priceChart) priceChart.destroy();
+
+        const ctx = document.getElementById('btcChart').getContext('2d');
+        priceChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Bitcoin Price (₦)',
+              data: prices,
+              borderColor: '#F4C542',
+              backgroundColor: 'rgba(244, 197, 66, 0.1)',
+              borderWidth: 3,
+              tension: 0.4,
+              pointRadius: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { grid: { color: '#E5E0FF' }, ticks: { color: '#6B46C1' } },
+              x: { grid: { color: '#E5E0FF' }, ticks: { color: '#6B46C1' } }
+            }
+          }
+        });
+      } catch (err) {
+        console.error("Chart data error:", err);
+      }
+    }
+
+    // Real-time update
+    function startLiveUpdates() {
+      fetchCryptoPrices();
+      fetchBtcHistory();
+      setInterval(() => {
+        fetchCryptoPrices();
+        // Chart refreshes every 5 minutes to avoid heavy calls
+      }, 30000); // 30 seconds
+    }
+
+    function logout() {
+      if (confirm("Logout from Creston Mining?")) window.location.href = "index.html";
+    }
+
+    function buyCrypto() {
+      alert("🛒 Buy crypto at cheaper rate\n\nRedirecting to integrated exchange (coming soon).");
+    }
+
+    function startTask() {
+      alert("📋 Loading daily tasks...\nEarn more BTC today!");
+    }
+
+    // Initialize
+    window.onload = () => {
+      startLiveUpdates();
+    };
+    // Mobile menu toggle
+function toggleMobileMenu() {
+    const navMenu = document.querySelector('.nav-menu');
+    navMenu.classList.toggle('active');
+}
+
+ </script>
+ <script>
+  // Get the button and the modal from the HTML
+const taskBtn = document.getElementById('taskBtn');
+const tradeModal = document.getElementById('tradeModal');
+
+// When the user clicks the Task button...
+taskBtn.onclick = function() {
+    // Change display from 'none' to 'flex' (centered)
+    tradeModal.style.display = 'flex';
+    
+    // Initialize the chart only when the modal opens
+    // This prevents the chart from being "squished" or invisible
+    if (typeof initChart === "function") {
+        initChart();
+    }
+};
+
+// Optional: Close the modal if the user clicks outside the content box
+window.onclick = function(event) {
+    if (event.target == tradeModal) {
+        tradeModal.style.display = "none";
+    }
+}
+  let tradeChart;
+let currentBtcPrice = 65000; // Starting point
+let tradeActive = false;
+let entryPrice = 0;
+let timeLeft = 180; // 3 minutes
+
+// 1. Initialize the Chart
+function initChart() {
+    const ctx = document.getElementById('tradeChart').getContext('2d');
+    tradeChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: Array(20).fill(''), // 20 empty labels for the "sliding" look
+            datasets: [{
+                label: 'BTC Price',
+                data: Array(20).fill(65000),
+                borderColor: '#00ffcc',
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: true,
+                backgroundColor: 'rgba(0, 255, 204, 0.1)'
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: false }, x: { display: false } },
+            animation: { duration: 500 }
+        }
+    });
+}
+
+// 2. The "Price Engine" (Updates every second)
+setInterval(() => {
+    // Random Walk: Price moves up or down by max 0.1%
+    const change = (Math.random() - 0.5) * 50; 
+    currentBtcPrice += change;
+    
+    document.getElementById('currentPriceDisplay').innerText = `$${currentBtcPrice.toFixed(2)}`;
+
+    if (tradeChart) {
+        tradeChart.data.datasets.data.push(currentBtcPrice);
+        tradeChart.data.datasets.data.shift();
+        tradeChart.update();
+    }
+}, 1000);
+
+// 3. Handling the Trade Logic
+document.getElementById('btnHigh').onclick = () => startTrade('high');
+document.getElementById('btnLow').onclick = () => startTrade('low');
+
+async function startTrade(type) {
+    const stake = parseFloat(document.getElementById('stakeAmount').value);
+    
+    // Check if user has enough balance (Assumes 'userBalance' variable exists from your dashboard)
+    if (isNaN(stake) || stake <= 0 || stake > userBalance) {
+        alert("Invalid stake or insufficient funds!");
+        return;
+    }
+
+    // Lock UI
+    tradeActive = true;
+    entryPrice = currentBtcPrice;
+    document.getElementById('entryPriceDisplay').innerText = `$${entryPrice.toFixed(2)}`;
+    document.getElementById('btnHigh').disabled = true;
+    document.getElementById('btnLow').disabled = true;
+
+    // Start Timer
+    let timerInterval = setInterval(() => {
+        timeLeft--;
+        let mins = Math.floor(timeLeft / 60);
+        let secs = timeLeft % 60;
+        document.getElementById('tradeTimer').innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            settleTrade(type, stake);
+        }
+    }, 1000);
+}
+
+function settleTrade(type, stake) {
+    const isWin = (type === 'high' && currentBtcPrice > entryPrice) || 
+                  (type === 'low' && currentBtcPrice < entryPrice);
+
+    if (isWin) {
+        const profit = stake * 1.8; // 80% return
+        updateFirebaseBalance(profit);
+        alert(`WIN! You made $${profit.toFixed(2)}`);
+    } else {
+        updateFirebaseBalance(-stake);
+        alert(`LOSS! You lost your stake of $${stake.toFixed(2)}`);
+    }
+
+    // Reset UI
+    location.reload(); // Quickest way to reset the modal and chart
+}
+ </script>
+</body>
+</html>

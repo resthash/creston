@@ -269,6 +269,137 @@ font-weight:600;
 color:#dc2626;
 font-weight:600;
 }
+.txn-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+.txn-card label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #333; }
+.txn-card input, .txn-card select {
+    width: 100%; border: none; outline: none; font-size: 15px; background: transparent;
+}
+.input-row { display: flex; justify-content: space-between; align-items: center; }
+.max-btn { color: #888; font-size: 12px; cursor: pointer; }
+.error-text { color: #ff3b30; font-size: 12px; margin-top: 10px; text-align: center; }
+.main-btn {
+    width: 100%; background: #007aff; color: #fff; border: none; padding: 15px;
+    border-radius: 10px; font-weight: 600; margin-top: 10px; cursor: pointer;
+}
+.right { margin-left: auto; font-weight: 500; }
+.asset-info-card { display: flex; align-items: center; gap: 10px; }
+
+/* Darken the overlay slightly for focus */
+.modal-overlay { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4); 
+    z-index: 1000; 
+    display: flex; 
+    align-items: flex-end; 
+}
+
+/* Background color set to a light iOS-style grey */
+.receive-content { 
+    background: #f4f7f9; 
+    width: 100%; 
+    border-radius: 20px 20px 0 0; 
+    padding: 20px; 
+    height: 100vh; /* Reduced from 100vh to give a "sheet" feel */
+    overflow-y: auto;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+}
+
+.receive-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 25px; 
+    padding: 0 5px;
+}
+
+.receive-header h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+#closeReceive {
+    font-size: 28px;
+    color: #999;
+    cursor: pointer;
+}
+
+/* Individual Card Styling */
+.receive-item { 
+    display: flex; 
+    align-items: center; 
+    background: #ffffff;
+    padding: 16px; 
+    border-radius: 12px; 
+    margin-bottom: 12px; 
+    gap: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    border: 1px solid #eaeaea; /* Light border for definition */
+}
+
+.receive-item img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+.receive-info { 
+    flex: 1; 
+    overflow: hidden; 
+}
+
+.receive-info h5 { 
+    margin: 0 0 4px 0; 
+    font-size: 15px; 
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.receive-info p { 
+    margin: 0; 
+    font-size: 13px; 
+    color: #888; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    font-family: monospace; /* Makes the crypto address look technical */
+}
+
+/* Action Buttons Container */
+.receive-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.action-icon {
+    width: 20px;
+    opacity: 0.4;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.action-icon:hover {
+    opacity: 0.8;
+}
+
+.hidden { display: none !important; }
+.receive-item { display:flex; align-items:center; padding:15px; border: 1px solid #eee; border-radius:12px; margin-bottom:12px; gap:12px; }
+.receive-info { flex:1; overflow:hidden; }
+.receive-info h5 { margin:0; font-size:14px; }
+.receive-info p { margin:0; font-size:11px; color:#888; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.copy-btn { cursor:pointer; font-size:18px; color:#2f80ed; }
 /* Responsiveness */
 @media (max-width: 480px) {
     .app-container { border-radius: 0; min-height: 100vh; }

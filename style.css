@@ -1,0 +1,216 @@
+:root {
+    --primary: #1e3a8a;
+    --text-dark: #111827;
+    --text-light: #6b7280;
+    --bg-app: #f3f4f6;
+    --white: #ffffff;
+    --border: #e5e7eb;
+}
+
+* {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-app);
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 1440px;
+    background: var(--white);
+    min-height: 100vh;
+    border-radius: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+.logo-circle {
+    background: var(--primary);
+    color: white;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* Balance Card */
+.balance-card {
+    margin: 0 20px;
+    padding: 25px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+}
+/* Layout for Balance and Button */
+.balance-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.balance-header {
+    margin-bottom: 0 !important; /* Reset margin for horizontal alignment */
+}
+
+/* Connect Wallet Button */
+.connect-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.connect-btn:hover {
+    background-color: #1d4ed8;
+}
+
+.connect-btn.connected {
+    background-color: #ecfdf5;
+    color: #059669;
+    border: 1px solid #059669;
+}
+
+/* Floating Chat Icon */
+.chat-widget {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 55px;
+    height: 55px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 0.2s;
+}
+
+.chat-widget:hover {
+    transform: scale(1.1);
+}
+
+.chat-icon {
+    font-size: 1.5rem;
+    color: white;
+}
+
+
+.balance-header {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+}
+
+#total-display {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* Actions */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 25px 15px;
+    text-align: center;
+}
+
+.circle {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 1.2rem; cursor: pointer;
+}
+
+.blue { background: #3b82f6; } .red { background: #ef4444; }
+.purple { background: #8b5cf6; } .green { background: #10b981; }
+
+.action-item p { font-size: 0.75rem; font-weight: 500; color: var(--text-light); }
+
+/* Tabs */
+.tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+}
+
+.tab-btn {
+    flex: 1; padding: 15px; border: none; background: none;
+    color: var(--text-light); font-weight: 600; cursor: pointer;
+}
+
+.tab-btn.active {
+    color: var(--text-dark);
+    border-bottom: 2px solid var(--text-dark);
+}
+
+/* Asset List */
+.asset-item {
+    display: flex; justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f9fafb;
+}
+
+.asset-left { display: flex; gap: 12px; align-items: center; }
+
+.icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: bold;
+}
+
+.meta { display: flex; flex-direction: column; }
+.name { font-weight: 700; font-size: 0.85rem; }
+.price-info { font-size: 0.75rem; color: var(--text-light); }
+.pos { color: #10b981; } .neg { color: #ef4444; }
+
+.asset-right { text-align: right; }
+.usd-val { font-weight: 600; display: block; }
+.unit-amt { font-size: 0.75rem; color: var(--text-light); }
+
+/* Responsiveness */
+@media (max-width: 480px) {
+    .app-container { border-radius: 0; min-height: 100vh; }
+
+    .chat-widget {
+    position: absolute; /* Keep it inside the card if on desktop */
+    bottom: 20px;
+    right: 20px;
+    }
+    .app-container {
+        position: relative;
+    }
+}

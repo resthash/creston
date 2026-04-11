@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoWallet - Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="app-container">
+    <header class="header">
+        <div class="brand">
+            <span class="logo-circle">R</span>
+            <span>Reinasset</span>
+        </div>
+        <div class="menu-btn">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+    </header>
+
+    <div class="balance-card">
+        <div id="userName" class="user-name"></div>
+        <div class="balance-top-row">
+            <div class="balance-header">
+                <span class="wallet-icon">📁</span>
+                <span class="label">Wallet Balance</span>
+            </div>
+            <div class="connect-btn" id="connect-wallet"><div>+</div><p>Connect Wallet</p></div>
+        </div>
+        <h1 id="total-display">$ 0.00</h1>
+    </div>
+
+<div class="chat-widget" id="chat-trigger">
+    <span class="chat-icon">💬</span>
+</div>
+    <nav class="actions-grid">
+        <div class="action-item"><div class="circle blue">↑</div><p>Send</p></div>
+        <div class="action-item"><div class="circle red">↓</div><p>Receive</p></div>
+        <div class="action-item"><div class="circle purple">⇆</div><p>Swap</p></div>
+        <div class="action-item"><div class="circle green">$</div><p>Buy</p></div>
+    </nav>
+
+<div class="tabs">
+<button class="tab-btn active" data-tab="asset-list">Assets</button>
+<button class="tab-btn" data-tab="nft">NFTs</button>
+<button class="tab-btn" data-tab="activity">Activity</button>
+</div>
+
+<section class="asset-list" id="asset-list-container"></section>
+<section class="asset-list hidden" id="nft-container"></section>
+<section class="asset-list hidden" id="activity-container"></section>
+</main>
+
+<script type="module" src="firebase.js"></script>
+<script type="module" src="user.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

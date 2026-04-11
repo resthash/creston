@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel</title>
+
+<style>
+body { margin:0; font-family: Arial, sans-serif; display:flex; background:#f4f7fb; }
+
+/* Sidebar */
+.sidebar { width:240px; background:#fff; height:100vh; border-right:1px solid #e6ecf2; padding:15px 0; }
+.sidebar h3 { font-size:12px; color:#9aa5b1; padding:0 20px; margin-bottom:10px; }
+.menu-item { display:flex; align-items:center; padding:12px 20px; color:#5f6c7b; cursor:pointer; border-left:3px solid transparent; font-size:14px; }
+.menu-item:hover { background:#f0f6ff; }
+.menu-item.active { background:#eef5ff; color:#2f80ed; border-left:3px solid #2f80ed; font-weight:600; }
+
+/* Main */
+.main { flex:1; padding:30px; }
+.main h2 { color:#2f80ed; margin-bottom:20px; }
+
+/* Card */
+.card { background:#fff; border-radius:10px; padding:20px; margin-bottom:20px; border:1px solid #e6ecf2; max-width:420px; }
+
+.card b { display:block; margin-bottom:15px; font-size:16px; }
+
+/* Form group */
+.form-group { margin-bottom:15px; }
+.form-group label {
+  display:block;
+  font-size:13px;
+  color:#6b7785;
+  margin-bottom:6px;
+}
+
+.form-group input {
+  width:100%;
+  padding:10px;
+  border-radius:6px;
+  border:1px solid #dfe6ee;
+  background:#f9fbfd;
+  font-size:14px;
+  outline:none;
+  transition:0.2s;
+}
+
+.form-group input:focus {
+  border-color:#2f80ed;
+  background:#fff;
+}
+
+/* Button */
+button {
+  width:100%;
+  padding:10px;
+  background:#2f80ed;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  font-size:14px;
+  cursor:pointer;
+  transition:0.2s;
+}
+button:hover { background:#1c60c4; }
+
+</style>
+<style>
+/* New Table Styles */
+.user-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.user-table th, .user-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e6ecf2; }
+.user-table th { background: #f8f9fa; color: #9aa5b1; font-size: 12px; text-transform: uppercase; }
+.edit-link { color: #2f80ed; cursor: pointer; font-weight: 600; text-decoration: none; }
+
+/* Modal Styles */
+.modal { display:none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+.modal-content { background: #fff; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; position: relative; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.close-modal { font-size: 24px; cursor: pointer; color: #9aa5b1; }
+.grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+/* Search Bar */
+.search-box { margin-bottom: 20px; padding: 10px; width: 300px; border-radius: 6px; border: 1px solid #dfe6ee; outline: none; }
+</style>
+</head>
+
+<body>
+
+
+<div class="sidebar">
+  <h3>NAVIGATION</h3>
+  <div class="menu-item active" id="dashboardBtn">📊 Dashboard</div>
+  <div class="menu-item" id="usersBtn">👤 Users</div>
+</div>
+
+<div class="main" id="content">
+  <h2>Dashboard</h2>
+</div>
+
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalUserName">Edit Wallet</h3>
+      <span class="close-modal" id="closeModal">&times;</span>
+    </div>
+    <div id="modalInputs" class="grid-inputs">
+      </div>
+    <br>
+    <button id="saveWalletBtn">Save Changes</button>
+  </div>
+</div>
+
+<!-- Firebase (no module, no auth/security) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAxm4GyDY2RSJXUI1iFpIHUGiPfiEQX9l8",
+  authDomain: "cryptwallet360.firebaseapp.com",
+  databaseURL: "https://cryptwallet360-default-rtdb.firebaseio.com",
+  projectId: "cryptwallet360",
+  storageBucket: "cryptwallet360.firebasestorage.app",
+  messagingSenderId: "464447906680",
+  appId: "1:464447906680:web:471b3482cf21557437de8d"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const content = document.getElementById('content');
+
+function setActive(el){
+  document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function loadDashboard(){
+  content.innerHTML = `
+    <h2>Dashboard</h2>
+    <div class="card">Welcome Admin</div>
+  `;
+}
+
+let currentEditingId = null;
+
+function loadUsers() {
+  content.innerHTML = `
+    <h2>Users Management</h2>
+    <input type="text" id="userSearch" class="search-box" placeholder="Search user by name...">
+    <table class="user-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Total Coins</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody"></tbody>
+    </table>
+  `;
+
+  const tableBody = document.getElementById('userTableBody');
+
+  db.ref('users').on('value', snapshot => {
+    tableBody.innerHTML = '';
+    snapshot.forEach(child => {
+      const user = child.val();
+      const id = child.key;
+      const wallet = user.wallet || {};
+      const coinCount = Object.keys(wallet).length;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><b>${user.name || 'Unknown'}</b><br><small style="color:#9aa5b1">${id}</small></td>
+        <td>${coinCount} Assets</td>
+        <td><span style="color:green">● Active</span></td>
+        <td><span class="edit-link" onclick="openEditModal('${id}', '${user.name}')">Edit Balances</span></td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  });
+}
+
+window.openEditModal = (id, name) => {
+  currentEditingId = id;
+  document.getElementById('modalUserName').innerText = "Edit " + name;
+  const modalInputs = document.getElementById('modalInputs');
+  
+  // Fetch current data for the inputs
+  db.ref('users/' + id + '/wallet').once('value', snap => {
+    const w = snap.val() || {};
+    const coins = ['usd', 'btc', 'eth', 'ltc', 'doge', 'usdt_trc', 'usdt_erc', 'bnb', 'trx'];
+    
+    modalInputs.innerHTML = '';
+    coins.forEach(c => {
+      modalInputs.innerHTML += `
+        <div class="form-group">
+          <label>${c.toUpperCase()}</label>
+          <input type="number" id="mod-${c}" value="${w[c] || 0}" step="any">
+        </div>
+      `;
+    });
+    document.getElementById('editModal').style.display = 'flex';
+  });
+};
+
+document.getElementById('saveWalletBtn').onclick = () => {
+  const coins = ['usd', 'btc', 'eth', 'ltc', 'doge', 'usdt_trc', 'usdt_erc', 'bnb', 'trx'];
+  const updates = {};
+  
+  coins.forEach(c => {
+    updates[c] = Number(document.getElementById('mod-' + c).value) || 0;
+  });
+
+  db.ref('users/' + currentEditingId + '/wallet').update(updates).then(() => {
+    showToast('Wallet updated successfully!');
+    document.getElementById('editModal').style.display = 'none';
+  });
+};
+
+document.getElementById('closeModal').onclick = () => {
+  document.getElementById('editModal').style.display = 'none';
+};
+function showToast(msg){
+  const t = document.createElement('div');
+  t.innerText = msg;
+  t.style.position='fixed';
+  t.style.bottom='20px';
+  t.style.right='20px';
+  t.style.background='#2f80ed';
+  t.style.color='#fff';
+  t.style.padding='10px 15px';
+  t.style.borderRadius='6px';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
+}
+
+// events
+document.getElementById('dashboardBtn').onclick = e=>{ setActive(e.target); loadDashboard(); };
+document.getElementById('usersBtn').onclick = e=>{ setActive(e.target); loadUsers(); };
+
+loadDashboard();
+</script>
+
+</body>
+</html>

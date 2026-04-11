@@ -1,3 +1,28 @@
+// ============================
+// MARKET PRICES
+// ============================
+
+const marketPrices = {
+    btc: 73450.50,
+    eth: 3820.15,
+    trx: 0.3150,
+    sol: 188.40,
+    doge: 0.175,
+    ada: 0.58
+};
+
+// ============================
+// PORTFOLIO CONFIG
+// ============================
+
+const config = {
+    totalGoal: 0.00,
+    tronAllocation: 0.00
+};
+
+// ============================
+// ASSETS
+// ============================
 
 const assets = [
     { id: 'btc', name: 'BITCOIN', symbol: 'BTC', icon: '₿', color: '#f59e0b', change: '+1.2%', funded: true },

@@ -17,7 +17,7 @@ const marketPrices = {
 
 const config = {
     totalGoal: 0.00,
-    tronAllocation: 0.00
+    tronAllocation: 10.00
 };
 
 // ============================

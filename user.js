@@ -50,25 +50,32 @@ async function loadPrices() {
         return;
     }
 
-    try {
-        // Corrected IDs for CoinGecko
-        const ids = "bitcoin,ethereum,tron,solana,dogecoin,cardano,ripple,polkadot,polygon-pos,avalanche-2,shiba-inu,chainlink,stellar,cosmos,litecoin,binancecoin,tether";
+try {
+        // 1. Use the correct CoinGecko IDs
+        const ids = "bitcoin,ethereum,tron,solana,dogecoin,cardano,ripple,polkadot,litecoin,binancecoin,tether";
         const res = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}`);
         const data = await res.json();
         
         prices = {};
         data.forEach(coin => {
             const symbol = coin.symbol.toLowerCase();
+            // Store by symbol (e.g., 'btc', 'eth', 'ltc', 'bnb', 'usdt')
             prices[symbol] = {
                 price: coin.current_price || 0,
                 change: coin.price_change_percentage_24h || 0
             };
         });
         
-        // Manual mapping for USDT variations from Admin Panel
+        // 2. Map Tether to all your network-specific keys
         if (prices['usdt']) {
             prices['usdt_trc'] = prices['usdt'];
             prices['usdt_erc'] = prices['usdt'];
+        }
+
+        // 3. Ensure 'bnb' is mapped correctly if the API returns 'binancecoin'
+        // CoinGecko usually returns 'bnb' as symbol, but just in case:
+        if (!prices['bnb'] && prices['binancecoin']) {
+            prices['bnb'] = prices['binancecoin'];
         }
 
         localStorage.setItem(PRICE_CACHE_KEY, JSON.stringify(prices));
@@ -84,7 +91,7 @@ function renderAssets() {
     if (!container || !userData) return;
 
     // 1. This is your master list of all coins you want to show
-    const supportedCoins = ["btc", "eth", "trx", "ltc", "doge", "usdt_trc", "bnb", "sol", "ada", "xrp"];
+    const supportedCoins = ["btc", "eth", "trx", "ltc", "doge", "usdt_trc", "bnb", "sol", "usdt_erc"];
 
     const logos = {
         btc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoin/info/logo.png",
@@ -95,8 +102,7 @@ function renderAssets() {
         usdt_trc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png",
         bnb: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png",
         sol: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png",
-        ada: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/cardano/info/logo.png",
-        xrp: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ripple/info/logo.png"
+        usdt_erc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png"
     };
 
     container.innerHTML = "";

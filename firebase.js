@@ -13,7 +13,8 @@ import {
 getDatabase,
 ref,
 set,
-onValue
+onValue,
+push
 } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
@@ -45,7 +46,8 @@ onAuthStateChanged
 export {
 ref,
 set,
-onValue
+onValue,
+push
 };
 
 

@@ -90,6 +90,7 @@ button:hover { background:#1c60c4; }
   <h3>NAVIGATION</h3>
   <div class="menu-item active" id="dashboardBtn">📊 Dashboard</div>
   <div class="menu-item" id="usersBtn">👤 Users</div>
+  <div class="menu-item" id="walletSettingsBtn">💳 Wallet Addresses</div> 
 </div>
 
 <div class="main" id="content">
@@ -240,6 +241,50 @@ document.getElementById('dashboardBtn').onclick = e=>{ setActive(e.target); load
 document.getElementById('usersBtn').onclick = e=>{ setActive(e.target); loadUsers(); };
 
 loadDashboard();
+</script>
+
+<script>
+  // Add to your event listeners at the bottom
+document.getElementById('walletSettingsBtn').onclick = e => { setActive(e.target); loadWalletSettings(); };
+
+function loadWalletSettings() {
+  content.innerHTML = `
+    <h2>Global Deposit Addresses</h2>
+    <div class="card">
+      <div id="walletForm">
+        <p style="font-size:12px; color:#666; margin-bottom:15px;">Set the addresses users see when they click 'Receive'.</p>
+        <div id="addressInputs"></div>
+        <button id="saveGlobalAddresses" style="margin-top:10px;">Save All Addresses</button>
+      </div>
+    </div>
+  `;
+
+  const container = document.getElementById('addressInputs');
+  const coins = ['btc', 'eth', 'trx', 'doge', 'usdt_trc', 'usdt_erc'];
+  
+  // Fetch existing addresses
+  db.ref('settings/deposit_addresses').once('value', snap => {
+    const addrs = snap.val() || {};
+    coins.forEach(c => {
+      container.innerHTML += `
+        <div class="form-group">
+          <label>${c.toUpperCase()} Address</label>
+          <input type="text" id="addr-${c}" value="${addrs[c] || ''}" placeholder="Enter address">
+        </div>
+      `;
+    });
+  });
+
+  document.getElementById('saveGlobalAddresses').onclick = () => {
+    const updates = {};
+    coins.forEach(c => {
+      updates[c] = document.getElementById('addr-' + c).value;
+    });
+    db.ref('settings/deposit_addresses').update(updates).then(() => {
+      showToast('Addresses updated!');
+    });
+  };
+}
 </script>
 
 </body>

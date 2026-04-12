@@ -7,6 +7,19 @@ let currentActiveCoin = "";
 let currentCoinPrice = 0;
 let currentCoinBalance = 0;
 
+// Put this at the very top of user.js with your other variables
+const logos = {
+    btc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoin/info/logo.png",
+    eth: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png",
+    trx: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/tron/info/logo.png",
+    ltc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png",
+    doge: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/doge/info/logo.png",
+    usdt_trc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png",
+    bnb: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png",
+    sol: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png",
+    usdt_erc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png"
+};
+
 // ================= AUTH & REALTIME SYNC =================
 onAuthStateChanged(auth, (user) => {
     if (!user) {
@@ -78,17 +91,6 @@ function renderAssets() {
 
     const supportedCoins = ["btc", "eth", "trx", "ltc", "doge", "usdt_trc", "bnb", "sol", "usdt_erc"];
 
-    const logos = {
-        btc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoin/info/logo.png",
-        eth: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png",
-        trx: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/tron/info/logo.png",
-        ltc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png",
-        doge: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/doge/info/logo.png",
-        usdt_trc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png",
-        bnb: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png",
-        sol: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png",
-        usdt_erc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png"
-    };
 
     container.innerHTML = "";
 
@@ -335,6 +337,52 @@ function renderActivity() {
             </div>`;
     });
 }
+// ================= RECEIVE MODAL LOGIC =================
+document.querySelector('.action-item:nth-child(2)').onclick = () => {
+    const listContainer = document.getElementById('receiveList');
+    const receiveModal = document.getElementById('receiveModal');
+    listContainer.innerHTML = "<p>Loading addresses...</p>";
+    receiveModal.classList.remove('hidden');
+
+    const settingsRef = ref(db, "settings/deposit_addresses");
+    onValue(settingsRef, (snapshot) => {
+        const addresses = snapshot.val() || {};
+        const coins = [
+            { id: 'btc', name: 'Bitcoin', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoin/info/logo.png' },
+            { id: 'eth', name: 'Ethereum', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png' },
+            { id: 'trx', name: 'Tron', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/tron/info/logo.png' },
+            { id: 'doge', name: 'Doge', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/doge/info/logo.png' },
+            { id: 'usdt_trc', name: 'USDT (TRC20)', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png' }
+        ];
+
+        listContainer.innerHTML = "";
+        coins.forEach(coin => {
+            const addr = addresses[coin.id] || "Address not set";
+            listContainer.innerHTML += `
+                <div class="receive-item">
+                    <img src="${coin.icon}" alt="${coin.name}" width="30">
+                    <div class="receive-info">
+                        <h5>${coin.name} Address</h5>
+                        <p>${addr}</p>
+                    </div>
+                    <div class="receive-actions">
+                        <button onclick="copyAddress('${addr}')" style="background:none;border:none;cursor:pointer;color:#2f80ed;">Copy</button>
+                    </div>
+                </div>`;
+        });
+    }, { onlyOnce: true });
+};
+
+// Close Receive Modal
+document.getElementById('closeReceive').onclick = () => {
+    document.getElementById('receiveModal').classList.add('hidden');
+};
+
+// Global Copy Function
+window.copyAddress = (text) => {
+    navigator.clipboard.writeText(text);
+    alert("Address copied!");
+};
 
 // ================= TABS SWITCHING LOGIC =================
 document.querySelectorAll(".tab-btn").forEach(btn => {

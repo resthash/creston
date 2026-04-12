@@ -14,7 +14,8 @@ getDatabase,
 ref,
 set,
 onValue,
-push
+push,
+update
 } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
@@ -47,7 +48,8 @@ export {
 ref,
 set,
 onValue,
-push
+push,
+update
 };
 
 

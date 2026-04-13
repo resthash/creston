@@ -15,10 +15,13 @@
 /* Crucial: This must be at the bottom of style.css */
 .hidden {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 /* Ensure each view container starts at the top and covers the screen */
-#home-view, 
+#view-home, 
 #view-settings, 
 #view-explore {
     width: 100%;
@@ -431,7 +434,7 @@ font-weight:600;
     opacity: 0.8;
 }
 
-.hidden { display: none !important; }
+
 .receive-item { display:flex; align-items:center; padding:15px; border: 1px solid #eee; border-radius:12px; margin-bottom:12px; gap:12px; }
 .receive-info { flex:1; overflow:hidden; }
 .receive-info h5 { margin:0; font-size:14px; }
@@ -604,11 +607,13 @@ font-weight:600;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4); 
-    backdrop-filter: blur(5px); /* Modern blur effect */
-    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6); /* Slightly darker for better focus */
+    backdrop-filter: blur(5px);
+    
+    /* ADD THESE THREE LINES to center the card */
+    display: none; 
+    align-items: center; 
     justify-content: center;
-    transition: all 0.3s ease;
 }
 
 /* Modal Box */
@@ -822,3 +827,17 @@ h5 {
 .icon-green { background: rgba(39, 174, 96, 0.1); color: #27ae60; }
 .icon-orange { background: rgba(242, 153, 74, 0.1); color: #f2994a; }
 .icon-red { background: rgba(235, 87, 87, 0.1); color: #eb5757; }
+
+
+
+/* This forces any view not currently active to vanish completely */
+#view-home.hidden, 
+#view-settings.hidden, 
+#view-explore.hidden {
+    display: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}

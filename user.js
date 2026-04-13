@@ -129,37 +129,47 @@ document.getElementById('exitPending').onclick = () => {
 // ================= LOAD PRICES (BINANCE API - NO LOCAL STORAGE) =================
 async function loadPrices() {
     try {
-        // Fetching all 24hr tickers from Binance
-        const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr`);
+        // 1. Updated URL
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tron,litecoin,dogecoin,binancecoin,solana&vs_currencies=usd&include_24hr_change=true`);
+        
+        if (!res.ok) throw new Error("API Network Response was not ok");
+        
         const data = await res.json();
         
-        // Symbols we want to track
-        const symbolsToMap = ["BTC", "ETH", "TRX", "LTC", "DOGE", "BNB", "SOL", "ADA", "XRP"];
-        
+        // 2. Map CoinGecko IDs to your local 'prices' keys
+        // CoinGecko uses IDs (bitcoin) rather than tickers (BTC)
+        const mapping = {
+            'bitcoin': 'btc',
+            'ethereum': 'eth',
+            'tron': 'trx',
+            'litecoin': 'ltc',
+            'dogecoin': 'doge',
+            'binancecoin': 'bnb',
+            'solana': 'sol'
+        };
+
         prices = {};
 
-        data.forEach(ticker => {
-            symbolsToMap.forEach(coin => {
-                if (ticker.symbol === `${coin}USDT`) {
-                    const lowCoin = coin.toLowerCase();
-                    prices[lowCoin] = {
-                        price: parseFloat(ticker.lastPrice) || 0,
-                        change: parseFloat(ticker.priceChangePercent) || 0
-                    };
-                }
-            });
+        // 3. New Loop Logic for CoinGecko's Object Format
+        Object.keys(mapping).forEach(id => {
+            if (data[id]) {
+                const localKey = mapping[id];
+                prices[localKey] = {
+                    price: data[id].usd || 0,
+                    change: data[id].usd_24h_change || 0
+                };
+            }
         });
 
-        // Stablecoin Mappings
+        // 4. Stablecoin Anchors (Since they are always $1.00)
         prices['usdt'] = { price: 1.00, change: 0.00 };
         prices['usdt_trc'] = prices['usdt'];
         prices['usdt_erc'] = prices['usdt'];
         
-        // Consistency mappings
-        if (prices['bnb']) prices['binancecoin'] = prices['bnb'];
+        console.log("Prices successfully updated via CoinGecko");
 
     } catch (e) {
-        console.error("Binance Price fetch failed", e);
+        console.warn("Price fetch failed:", e);
     }
 }
 

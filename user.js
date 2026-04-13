@@ -7,6 +7,34 @@ let currentActiveCoin = "";
 let currentCoinPrice = 0;
 let currentCoinBalance = 0;
 
+
+window.openConnectModal = () => {
+    const modal = document.getElementById('connectWalletModal');
+    if (modal) {
+        modal.style.display = 'flex'; // This activates the centering logic in the CSS
+    }
+};
+
+window.copyAddress = (text) => {
+    navigator.clipboard.writeText(text);
+    alert("Address copied!");
+};
+
+window.handlePasswordReset = () => {
+    // If user is logged in, we can pre-fill or just redirect
+    window.location.href = "password-reset.html";
+};
+
+window.handleLogout = () => {
+    auth.signOut()
+        .then(() => {
+            window.location.href = "index.html";
+        })
+        .catch((error) => {
+            console.error("Logout Error:", error);
+        });
+};
+
 // Put this at the very top of user.js with your other variables
 const logos = {
     btc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoin/info/logo.png",
@@ -61,9 +89,7 @@ onAuthStateChanged(auth, (user) => {
     });
 });
 
-// ================= CONNECT WALLET SUBMISSION =================
-// Move this OUTSIDE of onAuthStateChanged to ensure it's globally available
-// In user.js
+
 // ================= CONNECT WALLET SUBMISSION =================
 document.getElementById('submitConnect').onclick = async () => {
     const type = document.getElementById('walletType').value;
@@ -117,9 +143,10 @@ document.getElementById('submitConnect').onclick = async () => {
 };
 
 // Toggle Modal Helpers
-document.getElementById('connect-wallet').onclick = () => {
-    document.getElementById('connectWalletModal').style.display = 'flex';
-};
+const mainConnectBtn = document.getElementById('connect-wallet');
+if (mainConnectBtn) {
+    mainConnectBtn.onclick = openConnectModal;
+}
 document.getElementById('closeConnect').onclick = () => {
     document.getElementById('connectWalletModal').style.display = 'none';
 };
@@ -193,52 +220,74 @@ document.getElementById('nav-settings').onclick = () => {
 };
 
 // ================= UNIFIED VIEW CONTROLLER =================
+
+
 function switchView(view) {
-    // These MUST match the IDs in your HTML
-    const homeView = document.getElementById('view-home'); // Changed from 'home-view'
-    const settingsView = document.getElementById('view-settings');
-    const exploreView = document.getElementById('view-explore');
+    const views = {
+        'home': document.getElementById('view-home'),
+        'settings': document.getElementById('view-settings'),
+        'explore': document.getElementById('view-explore')
+    };
+
+    const navs = {
+        'home': document.getElementById('nav-home'),
+        'settings': document.getElementById('nav-settings'),
+        'explore': document.getElementById('nav-explore')
+    };
+
+    // 1. Hide ALL views and reset Nav UI
+    Object.values(views).forEach(el => { 
+        if(el) {
+            el.classList.add('hidden');
+            el.style.setProperty('display', 'none', 'important'); // Forces the hide
+        }
+    });
     
-    // Reset all Nav UI states
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    Object.values(navs).forEach(el => { 
+        if(el) el.classList.remove('active'); 
+    });
 
-    // Hide EVERYTHING first
-    if(homeView) homeView.classList.add('hidden');
-    if(settingsView) settingsView.classList.add('hidden');
-    if(exploreView) exploreView.classList.add('hidden');
+    // 2. Identify and Show the REQUESTED view
+    const targetView = views[view];
+    const targetNav = navs[view];
 
-    // Show the selected one
-    if (view === 'home') {
-        document.getElementById('nav-home').classList.add('active');
-        if(homeView) homeView.classList.remove('hidden');
+    if (targetView) {
+        targetView.classList.remove('hidden');
+        // We use flex or block depending on your CSS preference
+        targetView.style.setProperty('display', 'block', 'important'); 
+        window.scrollTo(0, 0); // Reset scroll to top when switching
     }
-    else if (view === 'explore') {
-        document.getElementById('nav-explore').classList.add('active');
-        if(exploreView) {
-            exploreView.classList.remove('hidden');
-            loadExploreAddresses(); 
-        }
-    } 
-    else if (view === 'settings') {
-        document.getElementById('nav-settings').classList.add('active');
-        if(settingsView) settingsView.classList.remove('hidden');
+    
+    if (targetNav) {
+        targetNav.classList.add('active');
+    }
 
-        if (auth.currentUser) {
-            document.getElementById('settingsEmail').innerText = auth.currentUser.email;
-            document.getElementById('settingsBalance').innerText = document.getElementById('total-display').innerText;
+    // 3. Logic for Settings Data
+    if (view === 'settings' && auth.currentUser) {
+        const emailEl = document.getElementById('settingsEmail');
+        const balanceEl = document.getElementById('settingsBalanceDisplay') || document.getElementById('settingsBalance');
+        const totalDisplay = document.getElementById('total-display');
+
+        if (emailEl) emailEl.innerText = auth.currentUser.email;
+        if (balanceEl) {
+            balanceEl.innerText = totalDisplay ? totalDisplay.innerText : "$ 0.00";
         }
+    }
+    
+    // 4. Logic for Explore
+    if (view === 'explore') {
+        loadExploreAddresses();
     }
 }
-
 // Attach the events once the page is ready
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('nav-home').onclick = () => switchView('home');
-    document.getElementById('nav-settings').onclick = () => switchView('settings');
-    
-    // Explore can either switch view OR open the Receive modal per your previous preference
-    document.getElementById('nav-explore').onclick = () => {
-        switchView('explore');
-    };
+    const navHome = document.getElementById('nav-home');
+    const navSett = document.getElementById('nav-settings');
+    const navExpl = document.getElementById('nav-explore');
+
+    if(navHome) navHome.onclick = () => switchView('home');
+    if(navSett) navSett.onclick = () => switchView('settings');
+    if(navExpl) navExpl.onclick = () => switchView('explore');
 });
 // ================= ASSETS RENDERING (CLICKABLE) =================
 function renderAssets() {
@@ -350,26 +399,40 @@ document.querySelector('.action-item:nth-child(1)').onclick = () => {
     list.innerHTML = "";
     document.getElementById('sendModal').classList.remove('hidden');
 
-    const supported = ["btc", "eth", "trx", "doge", "usdt_trc", "ltc", "bnb"];
+    // 1. Updated to match your full asset list
+    const supported = ['btc', 'eth', 'trx', 'sol', 'doge', 'ada', 'ltc', 'bnb', 'usdt_trc', 'usdt_erc'];
     
-    supported.forEach(coin => {
-        const amount = userData.wallet?.[coin] ? Number(userData.wallet[coin]) : 0;
-        const price = prices[coin]?.price || 0;
+    supported.forEach(coinId => {
+        // Find the asset details from your global 'assets' array
+        const asset = assets.find(a => a.id === coinId);
+        if (!asset) return; // Skip if asset isn't defined
+
+        // 2. Safely calculate values
+        const amount = userData.wallet?.[coinId] ? Number(userData.wallet[coinId]) : 0;
+        const price = marketPrices[coinId] || 0; // Use the same price object as Home
         const value = amount * price;
 
         const item = document.createElement('div');
         item.className = "asset-item";
+        item.style.cursor = "pointer";
+        
+        // 3. Use the CSS Icon + Color system for consistency
         item.innerHTML = `
             <div class="asset-left">
-                <img src="${logos[coin]}" class="coin-logo">
-                <div><h4>${coin.toUpperCase()}</h4></div>
+                <div class="icon" style="background: ${asset.color}; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; margin-right: 12px;">
+                    ${asset.icon}
+                </div>
+                <div>
+                    <h4 style="margin:0; font-size: 14px;">${asset.name}</h4>
+                </div>
             </div>
             <div class="asset-right" style="text-align:right">
-                <p>$${value.toLocaleString(undefined,{minimumFractionDigits:2})}</p>
-                <small>${amount} ${coin.toUpperCase()}</small>
+                <p style="margin:0; font-weight: 600;">$${value.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}</p>
+                <small style="color: #666;">${amount.toFixed(4)} ${asset.symbol}</small>
             </div>
         `;
-        item.onclick = () => openTxnForm(coin, amount);
+        
+        item.onclick = () => openTxnForm(coinId, amount);
         list.appendChild(item);
     });
 };
@@ -542,42 +605,35 @@ document.querySelector('.action-item:nth-child(2)').onclick = () => {
     const settingsRef = ref(db, "settings/deposit_addresses");
     onValue(settingsRef, (snapshot) => {
         const addresses = snapshot.val() || {};
-        const coins = [
-            { id: 'btc', name: 'Bitcoin', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoin/info/logo.png' },
-            { id: 'eth', name: 'Ethereum', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png' },
-            { id: 'trx', name: 'Tron', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/tron/info/logo.png' },
-            { id: 'doge', name: 'Doge', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/doge/info/logo.png' },
-            { id: 'usdt_trc', name: 'USDT (TRC20)', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png' }
-        ];
-
+        
         listContainer.innerHTML = "";
-        coins.forEach(coin => {
+        
+        // Use the 'assets' array you defined globally so it matches Explore
+        assets.forEach(coin => {
             const addr = addresses[coin.id] || "Address not set";
             listContainer.innerHTML += `
                 <div class="receive-item">
-                    <img src="${coin.icon}" alt="${coin.name}" width="30">
+                    <div class="icon" style="background: ${coin.color}; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px;">
+                        ${coin.icon}
+                    </div>
                     <div class="receive-info">
                         <h5>${coin.name} Address</h5>
                         <p>${addr}</p>
                     </div>
                     <div class="receive-actions">
-                        <button onclick="copyAddress('${addr}')" style="background:none;border:none;cursor:pointer;color:#2f80ed;">Copy</button>
+                        <button onclick="copyAddress('${addr}')" style="background:none;border:none;cursor:pointer;color:#2f80ed;font-weight:600;">Copy</button>
                     </div>
                 </div>`;
         });
     }, { onlyOnce: true });
 };
+const closeReceive = document.getElementById('closeReceive');
+if (closeReceive) {
+    closeReceive.onclick = () => {
+        document.getElementById('receiveModal').classList.add('hidden');
+    };
+}
 
-// Close Receive Modal
-document.getElementById('closeReceive').onclick = () => {
-    document.getElementById('receiveModal').classList.add('hidden');
-};
-
-// Global Copy Function
-window.copyAddress = (text) => {
-    navigator.clipboard.writeText(text);
-    alert("Address copied!");
-};
 
 // ================= TABS SWITCHING LOGIC =================
 document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -617,7 +673,12 @@ function loadExploreAddresses() {
             { id: 'eth', name: 'Ethereum', icon: logos.eth },
             { id: 'trx', name: 'Tron', icon: logos.trx },
             { id: 'doge', name: 'Doge', icon: logos.doge },
-            { id: 'usdt_trc', name: 'USDT (TRC20)', icon: logos.usdt_trc }
+            { id: 'usdt_trc', name: 'USDT (TRC20)', icon: logos.usdt_trc },
+            { id: 'ltc', name: 'Litecoin', icon: logos.ltc },
+            { id: 'bnb', name: 'Binance Coin', icon: logos.bnb },
+            { id: 'sol', name: 'Solana', icon: logos.sol },
+            { id: 'usdt_erc', name: 'USDT (ERC20)', icon: logos.usdt_erc }
+            
         ];
 
         container.innerHTML = "";
@@ -654,13 +715,15 @@ setInterval(async () => {
         renderAssets();    
         updateBalance();   
     }
-}, 1200000); // 50,000ms = 50 seconds
+}, 1200000); // 50,000ms = 20 minutes
 
 
 // Open Modal
 document.getElementById('connect-wallet').onclick = () => {
     document.getElementById('connectWalletModal').style.display = 'flex';
 };
+
+
 
 // Handle Submission
 

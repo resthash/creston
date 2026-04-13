@@ -138,39 +138,56 @@ window.smartsupp||(function(d) {
             </div>
     </div>
 
-    <div id="view-settings" class="view-section hidden">
-        <div class="view-header">
-            <h3>Settings</h3>
+    <div id="view-settings" class="hidden">
+    <div class="settings-header">
+        <h2>Settings</h2>
+    </div>
+
+    <div class="user-profile-section">
+        <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <p class="user-email" id="settingsEmail">user@example.com</p>
+        <p class="user-balance-small" id="settingsBalanceDisplay">$ 0.00</p>
+    </div>
+
+    <div class="settings-group">
+        <div class="settings-item" onclick="handlePasswordReset()">
+            <div class="settings-icon icon-blue">
+                <i class="fas fa-lock"></i>
+            </div>
+            <div class="settings-label">Reset Password</div>
+            <div class="settings-arrow">❯</div>
         </div>
         
-        <div class="settings-card">
-            <div class="profile-section">
-                <div class="profile-avatar">👤</div>
-                <div class="profile-meta">
-                    <h4 id="settingsEmail">user@email.com</h4>
-                    <p id="settingsBalance">Balance: $0.00</p>
-                </div>
+        <div class="settings-item" id="connect-wallet">
+            <div class="settings-icon icon-green">
+                <i class="fas fa-wallet"></i>
             </div>
-
-            <div class="settings-options">
-                <div class="settings-item">
-                    <span class="icon">🔒</span>
-                    <p>Reset Password</p>
-                </div>
-                <div class="settings-item">
-                    <span class="icon">💳</span>
-                    <p>Connect Wallet</p>
-                </div>
-                <div class="settings-item">
-                    <span class="icon">✉️</span>
-                    <div class="support-text">
-                        <p>Support</p>
-                        <small>reinasset@gmail.com</small>
-                    </div>
-                </div>
-            </div>
+            <div class="settings-label">Connect Wallet</div>
+            <div class="settings-arrow">❯</div>
         </div>
     </div>
+
+    <div class="settings-group">
+        <div class="settings-item" onclick="window.location.href='mailto:reinasset@gmail.com'">
+            <div class="settings-icon icon-orange">
+                <i class="fas fa-headset"></i>
+            </div>
+            <div class="settings-label">Contact Support</div>
+            <div class="settings-arrow">❯</div>
+        </div>
+    </div>
+
+    <div class="settings-group">
+        <div class="settings-item" onclick="auth.signOut()">
+            <div class="settings-icon icon-red">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <div class="settings-label" style="color: #eb5757;">Logout</div>
+        </div>
+    </div>
+</div>
 
     <nav class="bottom-nav">
         <div class="nav-item active" id="nav-home">

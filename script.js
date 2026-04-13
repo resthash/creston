@@ -30,9 +30,11 @@ const assets = [
     { id: 'trx', name: 'TRON', symbol: 'TRX', icon: '▼', color: '#dc2626', change: '+0.1%', funded: true },
     { id: 'sol', name: 'SOLANA', symbol: 'SOL', icon: 'S', color: '#14f195', change: '+5.4%', funded: false },
     { id: 'doge', name: 'DOGECOIN', symbol: 'DOGE', icon: 'Ð', color: '#c2a633', change: '-1.8%', funded: false },
-    { id: 'ada', name: 'CARDANO', symbol: 'ADA', icon: 'A', color: '#0033ad', change: '+0.2%', funded: false }
+    { id: 'ltc', name: 'LITECOIN', symbol: 'LTC', icon: 'Ł', color: '#345d9d', change: '-0.7%', funded: false },
+    { id: 'bnb', name: 'BNB', symbol: 'BNB', icon: 'B', color: '#f3ba2f', change: '+0.3%', funded: false },
+    { id: 'usdt_trc', name: 'USDT (TRC20)', symbol: 'USDT', icon: '₮', color: '#26a17b', change: '0.0%', funded: false },
+    { id: 'usdt_erc', name: 'USDT (ERC20)', symbol: 'USDT', icon: '₮', color: '#26a17b', change: '0.0%', funded: false }
 ];
-
 // ============================
 // WALLET RENDER
 // ============================
@@ -84,11 +86,19 @@ function renderWallet() {
                     <span class="name">${asset.name}</span>
 
                     <span class="price-info">
-                        $${marketPrices[asset.id].toLocaleString()}
-                        <small class="${isPositive ? 'pos' : 'neg'}">
-                            ${asset.change}
-                        </small>
-                    </span>
+    $${marketPrices[asset.id] ? marketPrices[asset.id].toLocaleString() : '0.00'}
+    ${(() => {
+        // Safe check for both price and units
+        const price = marketPrices[asset.id] || 0;
+        const units = displayUnits || 0;
+        const totalValue = price * units;
+        
+        return `<span class="total-value">$${totalValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
+                    })()}
+                    <small class="${isPositive ? 'pos' : 'neg'}">
+                        ${asset.change || '0.00%'}
+                    </small>
+                </span>
                 </div>
             </div>
 

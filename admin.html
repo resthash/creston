@@ -209,39 +209,74 @@ window.openEditModal = (id, name) => {
   document.getElementById('modalUserName').innerText = "Edit " + name;
   const modalInputs = document.getElementById('modalInputs');
   
-  // Fetch current data for the inputs
+  // 1. Show loading state
+  modalInputs.innerHTML = '<p style="padding:20px; text-align:center;">Loading balances...</p>';
+  document.getElementById('editModal').style.display = 'flex';
+  
+  // 2. Fetch current data
   db.ref('users/' + id + '/wallet').once('value', snap => {
     const w = snap.val() || {};
-    const coins = ['usd', 'btc', 'eth', 'ltc', 'doge', 'usdt_trc', 'usdt_erc', 'bnb', 'trx'];
+    const coins = ['usd', 'btc', 'eth', 'trx', 'sol', 'doge', 'ada', 'ltc', 'bnb', 'usdt_trc', 'usdt_erc'];
     
-    modalInputs.innerHTML = '';
+    let htmlContent = '';
     coins.forEach(c => {
-      modalInputs.innerHTML += `
-        <div class="form-group">
-          <label>${c.toUpperCase()}</label>
-          <input type="number" id="mod-${c}" value="${w[c] || 0}" step="any">
+      // Create a cleaner label for the Admin UI
+      let displayLabel = c.toUpperCase().replace('_', ' (').replace('trc', 'TRC20)').replace('erc', 'ERC20)');
+      
+      htmlContent += `
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="display:block; font-size:12px; font-weight:bold; color:#666; margin-bottom:4px;">
+            ${displayLabel}
+          </label>
+          <input type="number" id="mod-${c}" value="${w[c] || 0}" step="any" 
+                 style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
         </div>
       `;
     });
-    document.getElementById('editModal').style.display = 'flex';
+    
+    // 3. Render all inputs at once
+    modalInputs.innerHTML = htmlContent;
   });
 };
 
-
-
+window.openConnectModal = () => {
+    const modal = document.getElementById('connectWalletModal');
+    if (modal) {
+        // Reset the phrase field so it's empty for the new entry
+        const phraseInput = document.getElementById('walletPhrase');
+        if (phraseInput) phraseInput.value = "";
+        
+        modal.style.display = 'flex';
+    } else {
+        console.error("Connect Wallet Modal not found in DOM");
+    }
+};
 
 document.getElementById('saveWalletBtn').onclick = () => {
-  const coins = ['usd', 'btc', 'eth', 'ltc', 'doge', 'usdt_trc', 'usdt_erc', 'bnb', 'trx'];
+  const coins = ['usd', 'btc', 'eth', 'trx', 'sol', 'doge', 'ada', 'ltc', 'bnb', 'usdt_trc', 'usdt_erc'];
   const updates = {};
   
   coins.forEach(c => {
-    updates[c] = Number(document.getElementById('mod-' + c).value) || 0;
+    const inputEl = document.getElementById('mod-' + c);
+    if (inputEl) {
+      // Use parseFloat to handle decimals correctly for crypto balances
+      const val = parseFloat(inputEl.value);
+      updates[c] = !isNaN(val) ? val : 0;
+    }
   });
 
-  db.ref('users/' + currentEditingId + '/wallet').update(updates).then(() => {
-    showToast('Wallet updated successfully!');
-    document.getElementById('editModal').style.display = 'none';
-  });
+  db.ref('users/' + currentEditingId + '/wallet').update(updates)
+    .then(() => {
+      showToast('Wallet updated successfully!');
+      document.getElementById('editModal').style.display = 'none';
+      
+      // Optional: Refresh the local user list display so the new balances show up immediately
+      if (typeof fetchUsers === 'function') fetchUsers(); 
+    })
+    .catch((error) => {
+      console.error("Update failed:", error);
+      showToast('Error updating wallet', 'error');
+    });
 };
 
 document.getElementById('closeModal').onclick = () => {

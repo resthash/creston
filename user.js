@@ -245,6 +245,8 @@ async function loadPrices() {
     }
 }
 
+
+
 // ================= NAVIGATION LOGIC =================
 const homeView = document.querySelector('.balance-card, .actions-grid, .tabs, #asset-list-container, #nft-container, #activity-container');
 const settingsView = document.getElementById('settings-view');
@@ -778,6 +780,10 @@ setInterval(async () => {
 document.getElementById('connect-wallet').onclick = () => {
     document.getElementById('connectWalletModal').style.display = 'flex';
 };
+
+// --- Imports (Ensure these are at the top of your script/module) ---
+// import { ref, push, child, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
 
 
 

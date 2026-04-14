@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KYC Verification | Reinasset</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2f80ed;
+            --bg: #f8f9fb;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .kyc-card {
+            background: var(--white);
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .back-btn {
+            cursor: pointer;
+            font-size: 22px;
+            margin-right: 12px;
+            color: var(--text-dark);
+        }
+
+        h2 { font-size: 20px; margin: 0; color: var(--text-dark); }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #334155; }
+
+        select, .upload-area {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .upload-area {
+            border: 2px dashed #c4b5fd;
+            background: #f8f7ff;
+            height: 210px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #previewImg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .btn-upload {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* ==================== SUCCESS OVERLAY ==================== */
+        #successOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(248, 249, 251, 0.97);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-box {
+            text-align: center;
+            max-width: 420px;
+        }
+
+        .success-box .hourglass {
+            font-size: 110px;
+            margin-bottom: 20px;
+        }
+
+        .success-box h3 {
+            color: var(--text-dark);
+            font-size: 24px;
+            margin: 10px 0 15px 0;
+        }
+
+        .success-box p {
+            color: var(--text-gray);
+            font-size: 16.5px;
+            line-height: 1.6;
+        }
+
+        .return-btn {
+            margin-top: 35px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="kyc-card" id="formCard">
+    <div class="header">
+        <a href="user.html" class="back-btn">←</a>
+        <h2>KYC Verification</h2>
+    </div>
+
+    <div class="form-group">
+        <label>Select Document Type</label>
+        <select id="docType">
+            <option value="" disabled selected>Choose Document Type</option>
+            <option value="International Passport">International Passport</option>
+            <option value="Driver License">Driver License</option>
+            <option value="Voters Card">Voters Card</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Upload Document Image</label>
+        <div class="upload-area" onclick="document.getElementById('kycInput').click()">
+            <p id="uploadPlaceholder">Tap to select an image</p>
+            <img id="previewImg" src="" alt="Preview">
+        </div>
+        <input type="file" id="kycInput" accept="image/*" style="display: none;" onchange="previewFile()">
+    </div>
+
+    <button id="submitBtn" class="btn-upload" onclick="processKYC()">Upload</button>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div id="successOverlay">
+    <div class="success-box">
+        <h2>KYC Verification</h2>
+        <div class="hourglass">⏳</div>
+        <h3>Document Submitted</h3>
+        <p>Your document has been submitted successfully.<br>Awaiting approval.</p>
+        
+        <button class="return-btn" onclick="goToHome()">
+            ← Return to Home
+        </button>
+
+        <p style="margin-top: 40px; color: #94a3b8; font-size: 14px;">
+            You will be notified once your KYC is approved.
+        </p>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getDatabase, ref, push, child, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAxm4GyDY2RSJXUI1iFpIHUGiPfiEQX9l8",
+        authDomain: "cryptwallet360.firebaseapp.com",
+        databaseURL: "https://cryptwallet360-default-rtdb.firebaseio.com",
+        projectId: "cryptwallet360",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const imgbbKey = "386b3c277552c24cc70d57a3988ae7c3";
+
+    window.previewFile = function() {
+        const fileInput = document.getElementById('kycInput');
+        const preview = document.getElementById('previewImg');
+        const placeholder = document.getElementById('uploadPlaceholder');
+
+        if (fileInput.files && fileInput.files[0]) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    window.processKYC = async function() {
+        const docType = document.getElementById("docType").value;
+        const fileInput = document.getElementById("kycInput");
+        const btn = document.getElementById("submitBtn");
+
+        if (!docType) return alert("Please select a document type!");
+        if (!fileInput.files || !fileInput.files[0]) return alert("Please select an image!");
+
+        const file = fileInput.files[0];
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        try {
+            const formData = new FormData();
+            formData.append("image", file);
+
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await res.json();
+
+            if (result.success) {
+                const imageUrl = result.data.url;
+                const uid = auth.currentUser?.uid;
+                if (!uid) return alert("Please login first!");
+
+                const newKey = push(child(ref(db), `users/${uid}/activity`)).key;
+
+                const updates = {};
+                updates[`users/${uid}/kyc_document`] = imageUrl;
+                updates[`users/${uid}/kyc_status`] = "pending";
+                updates[`users/${uid}/kyc_type`] = docType;
+                updates[`users/${uid}/activity/${newKey}`] = {
+                    id: newKey,
+                    type: "kyc_submission",
+                    asset: docType,
+                    amount: "Verification",
+                    status: "pending",
+                    fileUrl: imageUrl,
+                    timestamp: serverTimestamp()
+                };
+
+                await update(ref(db), updates);
+
+                // Show Overlay
+                document.getElementById("successOverlay").style.display = "flex";
+            } 
+        } catch (e) {
+            console.error(e);
+            alert("Upload failed. Please try again.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Upload";
+        }
+    };
+
+    window.goToHome = function() {
+        window.location.href = "user.html";
+    };
+</script>
+
+</body>
+</html>

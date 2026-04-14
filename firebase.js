@@ -15,7 +15,9 @@ ref,
 set,
 onValue,
 push,
-update
+update,
+child,
+serverTimestamp
 } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
@@ -49,7 +51,9 @@ ref,
 set,
 onValue,
 push,
-update
+update,
+child,
+serverTimestamp
 };
 
 

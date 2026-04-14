@@ -90,7 +90,7 @@
                     <thead>
                         <tr>
                             <th>User Name</th>
-                            <th>Email</th>
+                           
                             <th>Total Balance (USD)</th>
                             <th>Action</th>
                         </tr>
@@ -105,6 +105,19 @@
                 <button class="btn btn-primary" style="margin-top:20px" onclick="saveUserBalances()">Update All Assets</button>
             </div>
         </section>
+        <div id="kyc-manager" style="display:none; margin-top: 40px; border-top: 2px solid var(--border); padding-top: 20px;">
+    <h2>KYC Document Verification</h2>
+    <div class="card" style="max-width: 500px;">
+        <label id="kyc-user-label">Document for User</label>
+        <div style="background: #f1f5f9; border-radius: 12px; overflow: hidden; margin: 15px 0; border: 1px solid var(--border);">
+            <img id="kyc-preview-img" src="" alt="KYC Document" style="width: 100%; display: block;">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-success" onclick="updateKYCStatus('verified')">Approve KYC</button>
+            <button class="btn" style="background: #e11d48; color: white;" onclick="updateKYCStatus('rejected')">Reject</button>
+        </div>
+    </div>
+</div>
 
         <section id="view-transactions" class="view-section">
             <h1>Pending Transactions</h1>
@@ -180,24 +193,105 @@
                 document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
         }
 
+        // Global variable to store live prices
+let livePrices = {};
+
+async function loadAdminPrices() {
+    try {
+        // Fetching directly from CoinGecko (usually works fine in most browsers)
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tron,solana,dogecoin,litecoin,binancecoin&vs_currencies=usd');
+        const data = await res.json();
+        
+        livePrices = {
+            btc: data.bitcoin.usd,
+            eth: data.ethereum.usd,
+            trx: data.tron.usd,
+            sol: data.solana.usd,
+            doge: data.dogecoin.usd,
+            ltc: data.litecoin.usd,
+            bnb: data.binancecoin.usd,
+            usd: 1, usdt_trc: 1, usdt_erc: 1
+        };
+        console.log("Prices updated successfully!");
+    } catch (e) {
+        console.log("Fallback to manual prices...");
+        // Set static fallback prices so it never shows $0.00
+        livePrices = { btc: 65000, eth: 3500, trx: 0.12, sol: 140, doge: 0.15, ltc: 80, bnb: 580, usd: 1 };
+    }
+}
         // --- USERS & BALANCES ---
-        function loadUsers() {
-            const tbody = document.getElementById('user-table-body');
-            db.ref('users').on('value', snap => {
-                tbody.innerHTML = '';
-                snap.forEach(child => {
-                    const u = child.val();
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${u.name || 'User'}</td>
-                        <td>${u.email || 'N/A'}</td>
-                        <td>$${(u.wallet?.usd || 0).toLocaleString()}</td>
-                        <td><button class="btn btn-primary btn-sm" onclick="initBalanceEdit('${child.key}', '${u.name}')">Edit Balances</button></td>
-                    `;
-                    tbody.appendChild(tr);
+// Ensure this exists at the top of your script
+ 
+
+async function loadUsers() {
+    const tbody = document.getElementById('user-table-body');
+    if (Object.keys(livePrices).length === 0) await loadAdminPrices();
+
+    db.ref('users').on('value', snap => {
+        tbody.innerHTML = '';
+        snap.forEach(child => {
+            const u = child.val();
+            const uid = child.key;
+            
+            let calculatedTotal = 0;
+            if (u.wallet) {
+                Object.keys(u.wallet).forEach(coinKey => {
+                    const amount = parseFloat(u.wallet[coinKey]) || 0;
+                    const price = livePrices[coinKey.toLowerCase()] || 0;
+                    calculatedTotal += (amount * price);
                 });
-            });
-        }
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <div style="font-weight:600;">${u.name || 'Unknown User'}</div>
+                    <small style="color:var(--text-gray)">${u.email || uid}</small>
+                </td>
+                <td style="color:var(--success); font-weight:700;">
+                    $${calculatedTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                </td>
+                <td>
+                    <button class="btn btn-primary btn-sm" onclick="initBalanceEdit('${uid}', '${u.name}')">Balance</button>
+                    
+                    <button class="btn btn-sm" 
+                        style="background: ${u.kyc_document ? '#7c4dff' : '#cbd5e1'}; color:white;" 
+                        onclick="viewKYC('${uid}', '${u.name}', '${u.kyc_document || ''}')">
+                        KYC ${u.kyc_status === 'pending' ? 'âš«' : ''}
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    });
+}
+
+// Open the KYC preview
+window.viewKYC = function(uid, name, imgUrl) {
+    if (!imgUrl) return alert("This user has not uploaded a KYC document yet.");
+    
+    state.activeUserId = uid;
+    document.getElementById('kyc-manager').style.display = 'block';
+    document.getElementById('balance-editor').style.display = 'none'; // hide balance editor
+    
+    document.getElementById('kyc-user-label').innerText = "Verifying: " + name;
+    document.getElementById('kyc-preview-img').src = imgUrl;
+    document.getElementById('kyc-manager').scrollIntoView({ behavior: 'smooth' });
+};
+
+// Update status in Firebase
+window.updateKYCStatus = function(newStatus) {
+    if (!state.activeUserId) return;
+    
+    const updates = {
+        kyc_status: newStatus
+    };
+
+    db.ref(`users/${state.activeUserId}`).update(updates).then(() => {
+        alert("User KYC status set to: " + newStatus);
+        document.getElementById('kyc-manager').style.display = 'none';
+    });
+};
 
         function initBalanceEdit(id, name) {
             state.activeUserId = id;

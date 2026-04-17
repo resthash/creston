@@ -50,13 +50,7 @@ if (createAccountBtn) {
         const name = document.getElementById('signupName').value;
         const email = document.getElementById('signupEmail').value;
         
-        // Wait for your Firebase auth logic to finish first
-        // Assuming your auth.js handles the actual Firebase creation:
-        
-        /* After successful Firebase registration:
-           await sendWelcomeEmail(name, email);
-           window.location.href = 'user.html';
-        */
+
     });
 }
 

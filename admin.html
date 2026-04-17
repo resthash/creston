@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | Reinasset</title>
+    <title>Admin Panel | ReVOUTPAY</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -186,11 +186,14 @@ s0.parentNode.insertBefore(s1,s0);
 <!--End of Tawk.to Script-->
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyAxm4GyDY2RSJXUI1iFpIHUGiPfiEQX9l8",
-            authDomain: "cryptwallet360.firebaseapp.com",
-            databaseURL: "https://cryptwallet360-default-rtdb.firebaseio.com",
-            projectId: "cryptwallet360",
-            storageBucket: "cryptwallet360.firebasestorage.app"
+            apiKey: "AIzaSyB9FhVg5fzw18luwnrvu-X9pDdyl_SanP4",
+            authDomain: "revoutpaywallet.firebaseapp.com",
+            databaseURL: "https://revoutpaywallet-default-rtdb.firebaseio.com",
+            projectId: "revoutpaywallet",
+            storageBucket: "revoutpaywallet.firebasestorage.app",
+            messagingSenderId: "161385768191",
+            appId: "1:161385768191:web:2ee1779a4af28dd36158ca",
+            measurementId: "G-FE3ZYY0HLN"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -476,7 +479,7 @@ async function saveUserBalances() {
     
     // HARDCODED SENDER ADDRESS
     // You can replace this with your actual Admin Wallet UID or a generic "SYSTEM" label
-    const adminUid = "REVOUTPAY INC"; 
+    const adminUid = "REVOUTPAY_INC"; 
     
     const updates = {};
     
@@ -514,7 +517,7 @@ async function saveUserBalances() {
     
     // HARDCODED SENDER ADDRESS
     // You can replace this with your actual Admin Wallet UID or a generic "SYSTEM" label
-    const adminUid = "REINASSET_SYSTEM_ADMIN"; 
+    const adminUid = "REVOUTPAY_INC"; 
     
     const updates = {};
     

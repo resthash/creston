@@ -4,39 +4,46 @@ db,
 createUserWithEmailAndPassword,
 signInWithEmailAndPassword,
 set,
-ref
+ref,
+onAuthStateChanged
 } from "./firebase.js";
 
+
+
 document.addEventListener("DOMContentLoaded", () => {
+    // 1. Get elements inside the loader
+    const loginPass = document.getElementById("loginPassword");
+    const toggleLogin = document.getElementById("toggleLoginPassword");
 
-// ================= PASSWORD TOGGLE =================
+    // 2. ONLY set the onclick if the element actually exists
+    if (toggleLogin && loginPass) {
+        toggleLogin.onclick = () => {
+            const isPassword = loginPass.type === "password";
+            loginPass.type = isPassword ? "text" : "password";
+            
+            // Swap icons (Make sure Font Awesome is linked in your <head>)
+            toggleLogin.className = isPassword ? "fas fa-eye-slash" : "fas fa-eye";
+        };
+    } else {
+        console.warn("Login password toggle elements not found on this page.");
+    }
+});
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. DEFINE the elements (Crucial Step)
+    const signupPass = document.getElementById("signupPassword");
+    const toggleSignup = document.getElementById("toggleSignupPassword");
 
-const login = document.getElementById("loginPassword")
-const signupPass = document.getElementById("signupPassword")
-
-const toggleLogin = document.getElementById("toggleLoginPassword")
-const toggleSignup = document.getElementById("toggleSignupPassword")
-
-toggleLogin.onclick = () => {
-    // Toggle the input type
-    const isPassword = loginPass.type === "password";
-    loginPass.type = isPassword ? "text" : "password";
-    
-    // Optional: Toggle the icon/text of the button
-    toggleLogin.innerHTML = isPassword ? "Hide" : "Show"; 
-    // Or if using icons: toggleLogin.className = isPassword ? "fas fa-eye-slash" : "fas fa-eye";
-};
-
-toggleSignup.onclick = () => {
-    // Toggle the input type
-    const isPassword = signupPass.type === "password";
-    signupPass.type = isPassword ? "text" : "password";
-    
-    // Optional: Toggle the icon/text of the button
-    toggleSignup.innerHTML = isPassword ? "Hide" : "Show"; 
-    // Or if using icons: toggleSignup.className = isPassword ? "fas fa-eye-slash" : "fas fa-eye";
-};
-
+    // 2. CHECK if they exist before adding the click
+    if (toggleSignup && signupPass) {
+        toggleSignup.onclick = () => {
+            const isPassword = signupPass.type === "password";
+            signupPass.type = isPassword ? "text" : "password";
+            
+            // 3. TOGGLE the icon classes (Cleaner than using .innerHTML)
+            toggleSignup.className = isPassword ? "fas fa-eye-slash" : "fas fa-eye";
+        };
+    }
+});
 
 // ================= SIGNUP =================
 
@@ -94,10 +101,7 @@ signupBtn.classList.remove("loading")
 signupBtn.innerText="Create account"
 
 }
-
 }
-
-
 // ================= LOGIN =================
 
 const loginBtn = document.getElementById("loginBtn")
@@ -138,5 +142,3 @@ loginBtn.innerText="Sign in"
 }
 
 }
-
-});

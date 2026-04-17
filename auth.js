@@ -18,14 +18,24 @@ const toggleLogin = document.getElementById("toggleLoginPassword")
 const toggleSignup = document.getElementById("toggleSignupPassword")
 
 toggleLogin.onclick = () => {
-loginPass.type =
-loginPass.type === "password" ? "text" : "password"
-}
+    // Toggle the input type
+    const isPassword = loginPass.type === "password";
+    loginPass.type = isPassword ? "text" : "password";
+    
+    // Optional: Toggle the icon/text of the button
+    toggleLogin.innerHTML = isPassword ? "Hide" : "Show"; 
+    // Or if using icons: toggleLogin.className = isPassword ? "fas fa-eye-slash" : "fas fa-eye";
+};
 
 toggleSignup.onclick = () => {
-signupPass.type =
-signupPass.type === "password" ? "text" : "password"
-}
+    // Toggle the input type
+    const isPassword = signupPass.type === "password";
+    signupPass.type = isPassword ? "text" : "password";
+    
+    // Optional: Toggle the icon/text of the button
+    toggleSignup.innerHTML = isPassword ? "Hide" : "Show"; 
+    // Or if using icons: toggleSignup.className = isPassword ? "fas fa-eye-slash" : "fas fa-eye";
+};
 
 
 // ================= SIGNUP =================

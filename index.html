@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RevoutPay — Smarter Crypto Investing</title>
+<link rel="stylesheet" href="login.css">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/png" href="chidenulogo.png">
+
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+    <div class="brand">
+        <div class="logo-circle">
+            <img src="chidenulogo.png" alt="revout-pay" class="nav-icon">
+        </div>
+        <span>RevoutPay</span>
+    </div>
+
+    <nav>
+        <a href="#" class="nav-signup">Invest</a>
+        <a href="#" class="nav-signup">Trade</a>
+        <a href="#" class="nav-signup">Earn</a>
+        <a href="#">Company</a>
+        <a href="#" id="nav-help">Help</a>
+    </nav>
+
+    <div class="nav-buttons">
+        <button id="openLogin" class="btn-outline">Sign in</button>
+    </div>
+</header>
+
+<!-- HERO -->
+
+<section class="hero">
+    <h1>Your Trusted Gate to Crypto</h1>
+    <p>Join millions investing securely in Bitcoin and digital assets with Revout Pay's multi-layered protection.</p>
+    
+    <div class="hero-buttons">
+        <button id="openSignup" class="btn-primary large">Create a Secure Account</button>
+        <a href="learn.html" style="text-decoration: none;">
+            <button class="btn-outline large">Learn more</button>
+        </a> 
+    </div>
+    <div class="hero-image" style="
+        background-image: url('https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=1000'); 
+        background-size: cover; 
+        background-position: center;
+        border-radius: 24px;
+        height: 400px;
+        width: 100%;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+    </div>
+
+<section class="why">
+    <h2>Why RevoutPay?</h2>
+    <div class="cards">
+        <div class="card">
+            <h3>Simplicity as standard</h3>
+            <p>Invest in crypto with an intuitive and beginner-friendly experience designed for everyone.</p>
+        </div>
+        <div class="card">
+            <h3>Security is our priority</h3>
+            <p>Multiple layers of protection keep your funds secure using modern infrastructure.</p>
+        </div>
+        <div class="card">
+            <h3>Support you can rely on</h3>
+            <p>Our team is available 24/7 to help you with your crypto journey.</p>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="feature-card">
+        <h3>24/7 support</h3>
+        <p>Meet RevoutPay AI support. Always available to answer your questions quickly.</p>
+        <button id="btn-support" class="btn-outline">Get support</button>
+        <img src="https://cdn-icons-png.flaticon.com/512/10044/10044800.png" class="feature-img" alt="Support">
+    </div>
+
+    <div class="feature-card">
+        <h3>Track the market</h3>
+        <p>Stay updated with live crypto price movements and track your assets.</p>
+        <button id="btn-market" class="btn-outline">View market</button>
+        <img src="https://cdn-icons-png.flaticon.com/512/3514/3514416.png" class="feature-img" alt="Market">
+    </div>
+
+    <div class="feature-card">
+        <h3>Understand crypto</h3>
+        <p>New or experienced — learn everything you need to invest confidently.</p>
+        <button id="btn-learn" class="btn-outline">Start learning</button>
+        <img src="https://cdn-icons-png.flaticon.com/512/2436/2436637.png" class="feature-img" alt="Learning">
+    </div>
+</section>
+
+
+
+
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+
+    <div class="testimonial">
+        <h4>Mike</h4>
+        <p>"What you see is what you get. My funds feel safe with RevoutPay."</p>
+        <div class="stars">★★★★★</div>
+    </div>
+
+    <div class="testimonial">
+        <h4>Que</h4>
+        <p>"A must-have app. Simple, secure and easy to use."</p>
+        <div class="stars">★★★★★</div>
+    </div>
+
+    <div class="testimonial">
+        <h4>Barns</h4>
+        <p>"Safe and makes investing simple."</p>
+        <div class="stars">★★★★★</div>
+    </div>
+
+</section>
+
+<!-- FOOTER -->
+ <section class="start">
+
+<div class="start-left">
+    <h2>Start investing today</h2>
+
+    <p>
+    RevoutPay makes investing straightforward, 
+    with a clear and intuitive app experience.
+    </p>
+
+    <div class="start-buttons">
+        <button id="btn-start-signup" class="btn-outline">
+            Sign up
+        </button>
+
+
+    </div>
+</div>
+
+<div class="start-right">
+    <img src="/chidenulogo.png" class="app-img">
+</div>
+
+</section>
+
+<footer>
+    &copy; 2026 Revout Pay. All rights reserved.
+</footer>
+
+<!-- SCRIPTS -->
+ <!-- AUTH MODAL -->
+<div id="authModal" class="modal">
+
+<div class="modal-content">
+
+<span class="close-modal" id="closeModal">&times;</span>
+
+<!-- LOGIN FORM -->
+<div id="loginForm" class="auth-form">
+
+<h2>Sign in</h2>
+<div id="loginMessage" class="auth-message"></div>
+
+<input type="email" id="loginEmail" placeholder="Email">
+<div class="password-wrap">
+
+<input type="password" id="loginPassword" placeholder="Password">
+
+<span id="toggleLoginPassword" class="toggle-password">👁</span>
+
+</div>
+
+<button id="loginBtn" class="btn-primary full">
+Sign in
+</button>
+
+<p>
+Don't have an account?
+<a href="#" id="showSignup">Create account</a>
+</p>
+
+</div>
+
+
+<!-- SIGNUP FORM -->
+<div id="signupForm" class="auth-form hidden">
+
+<h2>Create account</h2>
+<div id="signupMessage" class="auth-message"></div>
+
+<input type="text" id="signupName" placeholder="Full name">
+<input type="email" id="signupEmail" placeholder="Email">
+
+<div class="password-wrap">
+
+<input type="password" id="signupPassword" placeholder="Password">
+<span id="toggleSignupPassword" class="toggle-password">👁</span>
+
+</div>
+
+<div class="strength-meter">
+<div id="strengthBar"></div>
+</div>
+
+<small id="strengthText"></small>
+
+<ul class="password-rules">
+<li id="rule-length">At least 8 characters</li>
+<li id="rule-upper">One uppercase letter</li>
+<li id="rule-number">One number</li>
+<li id="rule-symbol">One special character</li>
+</ul>
+
+
+<button id="createAccountBtn" class="btn-primary full">
+Create account
+</button>
+
+<p>
+Already have an account?
+<a href="#" id="showLogin">Sign in</a>
+</p>
+
+</div>
+
+
+
+</div>
+
+</div>
+</div>
+
+<script>
+    // NAVIGATION SCRIPT
+    // Invest, Trade, Earn -> Open Signup Modal
+    document.querySelectorAll('.nav-signup').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('authModal').style.display = 'flex';
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('signupForm').classList.remove('hidden');
+        });
+    });
+
+    // Help -> Open Login Modal
+    document.getElementById('nav-help').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('authModal').style.display = 'flex';
+        document.getElementById('signupForm').classList.add('hidden');
+        document.getElementById('loginForm').classList.remove('hidden');
+    });
+</script>                                   
+<script type="module" src="firebase.js"></script>
+<script type="module" src="auth.js"></script>
+<script type="module" src="script.js"></script>
+</body>
+</html>

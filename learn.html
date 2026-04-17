@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Revout Pay — How It Works</title>
+    <link rel="icon" type="image/png" href="chidenulogo.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2f80ed;
+            --text: #1e293b;
+            --light-bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .learn-header {
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section {
+            margin-bottom: 80px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .section:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .section-text {
+            flex: 1;
+        }
+
+        .section-image {
+            flex: 1;
+            background: var(--light-bg);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .section-image i {
+            font-size: 80px;
+            color: var(--primary);
+        }
+
+        h1 { font-size: 3rem; margin-bottom: 20px; }
+        h2 { font-size: 2rem; color: var(--primary); }
+
+        .back-nav {
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            z-index: 100;
+        }
+
+        .cta-box {
+            background: var(--primary);
+            color: white;
+            padding: 60px;
+            border-radius: 30px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--primary);
+            padding: 15px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .section, .section:nth-child(even) { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="back-nav">
+        <a href="index.html" style="text-decoration: none; color: var(--primary); font-weight: 600;">
+            <i class="fas fa-arrow-left"></i> Back to Revout Pay
+        </a>
+    </nav>
+
+    <header class="learn-header">
+        <h1>Everything you need to know</h1>
+        <p>Discover how Revout Pay is redefining digital finance for everyone.</p>
+    </header>
+
+    <div class="container">
+        
+        <div class="section">
+            <div class="section-text">
+                <h2>Bank-Grade Security</h2>
+                <p>We use end-to-end encryption and multi-signature cold storage to ensure your assets are protected. Your peace of mind is our highest priority.</p>
+            </div>
+            <div class="section-image">
+                <i class="fas fa-user-shield"></i>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-text">
+                <h2>Seamless Investing</h2>
+                <p>Buying Bitcoin, Ethereum, and other digital assets shouldn't be complicated. With Revout Pay, you can start your portfolio with as little as $10.</p>
+            </div>
+            <div class="section-image">
+                <i class="fas fa-chart-line"></i>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-text">
+                <h2>Put your crypto to work</h2>
+                <p>Don't just hold your assets—earn rewards on them. Our staking and savings programs offer competitive APY rates paid out daily.</p>
+            </div>
+            <div class="section-image">
+                <i class="fas fa-coins"></i>
+            </div>
+        </div>
+
+        <div class="cta-box">
+            <h2>Ready to start your journey?</h2>
+            <p>Join over 15 million users worldwide today.</p>
+            <a href="index.html" class="btn-white">Create Your Account</a>
+        </div>
+
+    </div>
+
+    <footer style="text-align: center; padding: 40px; color: #94a3b8;">
+        &copy; 2026 Revout Pay. All rights reserved.
+    </footer>
+
+</body>
+</html>

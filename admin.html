@@ -17,7 +17,7 @@
             --success: #27ae60;
         }
 
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: none; height: 100vh; overflow: hidden; }
 
         /* Sidebar & Navigation */
         .sidebar { width: var(--sidebar-width); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding-top: 20px; transition: transform 0.3s ease; z-index: 1000; }
@@ -186,18 +186,40 @@ s0.parentNode.insertBefore(s1,s0);
 </script>
 <!--End of Tawk.to Script-->
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyB9FhVg5fzw18luwnrvu-X9pDdyl_SanP4",
-            authDomain: "revoutpaywallet.firebaseapp.com",
-            databaseURL: "https://revoutpaywallet-default-rtdb.firebaseio.com",
-            projectId: "revoutpaywallet",
-            storageBucket: "revoutpaywallet.firebasestorage.app",
-            messagingSenderId: "161385768191",
-            appId: "1:161385768191:web:2ee1779a4af28dd36158ca",
-            measurementId: "G-FE3ZYY0HLN"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+// 1. Authorized Admin List
+const authorizedAdmins = ["univeilingnight@gmail.com", "revoutpay@gmail.com"];
+
+// 2. Initialize Firebase (Keep your existing config)
+const firebaseConfig = {
+    apiKey: "AIzaSyB9FhVg5fzw18luwnrvu-X9pDdyl_SanP4",
+    authDomain: "revoutpaywallet.firebaseapp.com",
+    databaseURL: "https://revoutpaywallet-default-rtdb.firebaseio.com",
+    projectId: "revoutpaywallet",
+    storageBucket: "revoutpaywallet.firebasestorage.app",
+    messagingSenderId: "161385768191",
+    appId: "1:161385768191:web:2ee1779a4af28dd36158ca",
+    measurementId: "G-FE3ZYY0HLN"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();
+
+// 3. Security Check: Only allow the 2 specific emails
+auth.onAuthStateChanged((user) => {
+    if (user && authorizedAdmins.includes(user.email.toLowerCase())) {
+        console.log("Access Granted");
+        // Reveal the UI only for the two admins
+        document.body.style.display = "flex"; 
+        loadAdminPrices(); // Pre-load your prices
+    } else {
+        // Not an admin? Send them back to login
+        alert("Restricted Access: Admins Only");
+        window.location.href = "index.html";
+    }
+});
+
+
 
         // App State
         let state = {
@@ -704,9 +726,13 @@ function loadPhrases() {
             db.ref('settings/deposit_addresses').update(updates).then(() => alert("Addresses Saved."));
         }
 
-        function handleLogout() {
-            if(confirm("Logout from Admin?")) window.location.href = "login.html";
-        }
+function handleLogout() {
+    if(confirm("Logout from Admin Panel?")) {
+        auth.signOut().then(() => {
+            window.location.href = "index.html";
+        });
+    }
+}
     </script>
 </body>
 </html>

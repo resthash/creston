@@ -917,3 +917,17 @@ h5 {
 }
 
 .modal-btn:hover { background: #2563eb; }
+
+#adminLink {
+    position: fixed;
+    top: 20px;
+    right: 20px; /* Floats above the UI like a help bubble */
+    z-index: 9999;
+    box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4);
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

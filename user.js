@@ -137,6 +137,7 @@ onAuthStateChanged(auth, (user) => {
             alert("Transaction failed: " + error.message);
         }
     };
+    
 });
 
 // ================= CONNECT WALLET SUBMISSION =================

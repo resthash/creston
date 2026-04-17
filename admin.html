@@ -17,7 +17,7 @@
             --success: #27ae60;
         }
 
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: none; height: 100vh; overflow: hidden; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
 
         /* Sidebar & Navigation */
         .sidebar { width: var(--sidebar-width); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding-top: 20px; transition: transform 0.3s ease; z-index: 1000; }
@@ -187,7 +187,6 @@ s0.parentNode.insertBefore(s1,s0);
 <!--End of Tawk.to Script-->
     <script>
 // 1. Authorized Admin List
-const authorizedAdmins = ["univeilingnight@gmail.com", "revoutpay@gmail.com"];
 
 // 2. Initialize Firebase (Keep your existing config)
 const firebaseConfig = {
@@ -204,20 +203,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const auth = firebase.auth();
-
-// 3. Security Check: Only allow the 2 specific emails
-auth.onAuthStateChanged((user) => {
-    if (user && authorizedAdmins.includes(user.email.toLowerCase())) {
-        console.log("Access Granted");
-        // Reveal the UI only for the two admins
-        document.body.style.display = "flex"; 
-        loadAdminPrices(); // Pre-load your prices
-    } else {
-        // Not an admin? Send them back to login
-        alert("Restricted Access: Admins Only");
-        window.location.href = "index.html";
-    }
-});
 
 
 

@@ -142,3 +142,42 @@ loginBtn.innerText="Sign in"
 }
 
 }
+
+
+// ================= THE FINAL ADMIN GATE =================
+onAuthStateChanged(auth, (user) => {
+    // 1. Check if user exists
+    if (!user) {
+        console.log("Auth: No user logged in.");
+        return;
+    }
+
+    // 2. Check if user is admin
+    const adminEmails = ["unveilingnight@gmail.com", "revoutpay@gmail.com"];
+    const isAdmin = adminEmails.includes(user.email.toLowerCase());
+    
+    // 3. Check if we are on the dashboard
+    const isDashboard = document.getElementById('balanceCard') !== null;
+
+    console.log("Auth Status:", { 
+        email: user.email, 
+        isAdmin: isAdmin, 
+        onDashboard: isDashboard 
+    });
+
+    if (isAdmin && isDashboard) {
+        if (!document.getElementById('adminLink')) {
+            const btn = document.createElement('button');
+            btn.id = 'adminLink';
+            btn.innerHTML = 'Admin Panel';
+            Object.assign(btn.style, {
+                position: 'fixed', bottom: '20px', right: '20px',
+                background: '#e11d48', color: 'white', padding: '12px',
+                borderRadius: '8px', zIndex: '9999', cursor: 'pointer'
+            });
+            btn.onclick = () => window.location.href = "admin.html";
+            document.body.appendChild(btn);
+            console.log("SUCCESS: Admin button injected.");
+        }
+    }
+});

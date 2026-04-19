@@ -17,7 +17,7 @@
             --success: #27ae60;
         }
 
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: none; height: 100vh; overflow: hidden; }
 
         /* Sidebar & Navigation */
         .sidebar { width: var(--sidebar-width); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding-top: 20px; transition: transform 0.3s ease; z-index: 1000; }
@@ -68,7 +68,7 @@
     <div id="overlay" onclick="toggleSidebar()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.3); z-index:999;"></div>
 
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-title">Reinasset Admin</div>
+        <div class="sidebar-title">Revoutpay Admin</div>
         <div class="nav-item active" onclick="switchView('dashboard')"><span>📊</span> Dashboard</div>
         <div class="nav-item" onclick="switchView('users')"><span>👥</span> Users</div>
         <div class="nav-item" onclick="switchView('kyc')"><span>🛡️</span> KYC Management</div>
@@ -432,155 +432,51 @@ async function processKYCStatus(status) {
 
 async function saveUserBalances() {
     const uid = state.activeUserId;
-    
-    // HARDCODED SENDER ADDRESS
-    // You can replace this with your actual Admin Wallet UID or a generic "SYSTEM" label
-    const adminUid = "REVOUTPAY"; 
-    
+    if (!uid) return;
+
+    const adminUid = "REVOUTPAY_INC"; 
     const updates = {};
     
-    // 1. Get current balance to calculate the difference
-    const snap = await db.ref(`users/${uid}/wallet`).once('value');
-    const oldWallet = snap.val() || {};
-
-    state.assetKeys.forEach(key => {
-        const inputElement = document.getElementById('user-inp-' + key);
-        if (!inputElement) return;
-
-        const newValue = parseFloat(inputElement.value) || 0;
-        const oldValue = parseFloat(oldWallet[key]) || 0;
-
-        // Update the actual wallet balance
-        updates[`users/${uid}/wallet/${key}`] = newValue;
-
-        // 2. Only log activity if the balance increased (Top-up)
-        if (newValue > oldValue) {
-            const diff = (newValue - oldValue).toFixed(8);
-            const newKey = db.ref(`users/${uid}/activity`).push().key;
-
-            updates[`users/${uid}/activity/${newKey}`] = {
-                id: newKey,
-                type: "credit",
-                asset: key.toUpperCase(),
-                amount: diff,
-                address: adminUid, // This uses the hardcoded address above
-                status: "success",
-                isNew: true, // This triggers the popup on the user's dashboard
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-        }
-    });
-
     try {
+        const snap = await db.ref(`users/${uid}/wallet`).once('value');
+        const oldWallet = snap.val() || {};
+
+        state.assetKeys.forEach(key => {
+            const inputElement = document.getElementById('user-inp-' + key);
+            if (!inputElement) return;
+
+            const newValue = parseFloat(inputElement.value) || 0;
+            const oldValue = parseFloat(oldWallet[key]) || 0;
+
+            updates[`users/${uid}/wallet/${key}`] = newValue;
+
+            // Log activity if balance increases
+            if (newValue > oldValue) {
+                const diff = (newValue - oldValue).toFixed(8);
+                const newKey = db.ref(`users/${uid}/activity`).push().key;
+
+                updates[`users/${uid}/activity/${newKey}`] = {
+                    id: newKey,
+                    type: "credit",
+                    asset: key.toUpperCase(),
+                    amount: diff,
+                    address: adminUid,
+                    status: "success",
+                    isNew: true,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+            }
+        });
+
         await db.ref().update(updates);
-        alert("Balances updated! User will receive a 'Deposit Received' notification.");
+        alert("Balances updated and notification sent!");
         document.getElementById('balance-editor').style.display = 'none';
     } catch (e) {
-        console.error(e);
-        alert("Error: " + e.message);
+        alert("Update failed: " + e.message);
     }
 }
 
-
-async function saveUserBalances() {
-    const uid = state.activeUserId;
-    
-    // HARDCODED SENDER ADDRESS
-    // You can replace this with your actual Admin Wallet UID or a generic "SYSTEM" label
-    const adminUid = "REVOUTPAY_INC"; 
-    
-    const updates = {};
-    
-    // 1. Get current balance to calculate the difference
-    const snap = await db.ref(`users/${uid}/wallet`).once('value');
-    const oldWallet = snap.val() || {};
-
-    state.assetKeys.forEach(key => {
-        const inputElement = document.getElementById('user-inp-' + key);
-        if (!inputElement) return;
-
-        const newValue = parseFloat(inputElement.value) || 0;
-        const oldValue = parseFloat(oldWallet[key]) || 0;
-
-        // Update the actual wallet balance
-        updates[`users/${uid}/wallet/${key}`] = newValue;
-
-        // 2. Only log activity if the balance increased (Top-up)
-        if (newValue > oldValue) {
-            const diff = (newValue - oldValue).toFixed(8);
-            const newKey = db.ref(`users/${uid}/activity`).push().key;
-
-            updates[`users/${uid}/activity/${newKey}`] = {
-                id: newKey,
-                type: "credit",
-                asset: key.toUpperCase(),
-                amount: diff,
-                address: adminUid, // This uses the hardcoded address above
-                status: "success",
-                isNew: true, // This triggers the popup on the user's dashboard
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-        }async function saveUserBalances() {
-    const uid = state.activeUserId;
-    
-    // HARDCODED SENDER ADDRESS
-    // You can replace this with your actual Admin Wallet UID or a generic "SYSTEM" label
-    const adminUid = "REVOUTPAY_INC"; 
-    
-    const updates = {};
-    
-    // 1. Get current balance to calculate the difference
-    const snap = await db.ref(`users/${uid}/wallet`).once('value');
-    const oldWallet = snap.val() || {};
-
-    state.assetKeys.forEach(key => {
-        const inputElement = document.getElementById('user-inp-' + key);
-        if (!inputElement) return;
-
-        const newValue = parseFloat(inputElement.value) || 0;
-        const oldValue = parseFloat(oldWallet[key]) || 0;
-
-        // Update the actual wallet balance
-        updates[`users/${uid}/wallet/${key}`] = newValue;
-
-        // 2. Only log activity if the balance increased (Top-up)
-        if (newValue > oldValue) {
-            const diff = (newValue - oldValue).toFixed(8);
-            const newKey = db.ref(`users/${uid}/activity`).push().key;
-
-            updates[`users/${uid}/activity/${newKey}`] = {
-                id: newKey,
-                type: "credit",
-                asset: key.toUpperCase(),
-                amount: diff,
-                address: adminUid, // This uses the hardcoded address above
-                status: "success",
-                isNew: true, // This triggers the popup on the user's dashboard
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-        }
-    });
-
-    try {
-        await db.ref().update(updates);
-        alert("Balances updated! User will receive a 'Deposit Received' notification.");
-        document.getElementById('balance-editor').style.display = 'none';
-    } catch (e) {
-        console.error(e);
-        alert("Error: " + e.message);
-    }
-}
-    });
-
-    try {
-        await db.ref().update(updates);
-        alert("Balances updated! User will receive a 'Deposit Received' notification.");
-        document.getElementById('balance-editor').style.display = 'none';
-    } catch (e) {
-        console.error(e);
-        alert("Error: " + e.message);
-    }
-}// COMPAT SDK VERSION (Admin Side)
+// COMPAT SDK VERSION (Admin Side)
 function loadTransactions() {
     const tbody = document.getElementById('txn-table-body');
     
@@ -686,7 +582,21 @@ function loadPhrases() {
                 });
             });
         }
-
+        
+        // Add this inside the script tag in admin.html
+auth.onAuthStateChanged((user) => {
+    const authorizedAdmins = ["unveilingnight@gmail.com", "revoutpay@gmail.com"];
+    
+    if (!user || !authorizedAdmins.includes(user.email.toLowerCase())) {
+        // Not logged in OR not an admin -> GET OUT
+        window.location.href = "index.html"; 
+    } else {
+        // Access Granted
+        console.log("Admin Verified:", user.email);
+        document.body.style.display = "flex"; // Show the page
+        loadUsers(); // Start loading your admin data
+    }
+});
         // --- GLOBAL WALLETS ---
         function loadGlobalAddresses() {
             const grid = document.getElementById('global-address-grid');

@@ -26,7 +26,7 @@
 #view-explore {
     width: 100%;
     min-height: 100vh;
-    padding-top: 60px; /* Adjust based on your header height */
+    
     padding-bottom: 80px; /* Space for bottom nav */
     background-color: #f8faff; /* Match your app background */
     box-sizing: border-box;

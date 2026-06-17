@@ -339,7 +339,7 @@ font-weight:600;
 }
 .input-row { display: flex; justify-content: space-between; align-items: center; }
 .max-btn { color: #668af5; font-size: 12px; cursor: pointer; }
-.error-text { color: #ff3b30; font-size: 12px; margin-top: 10px; text-align: center; }
+.error-text { color: #ff3b30; font-size: 12px; margin-bottom: 4em; text-align: center; }
 .main-btn {
     width: 100%; background: #007aff; color: #fff; border: none; padding: 15px;
     border-radius: 10px; font-weight: 600; margin-bottom: 4em; cursor: pointer;

@@ -522,7 +522,7 @@ document.querySelector('.max-btn').onclick = () => {
 // ================= TRANSACTION SUBMISSION =================
 document.getElementById('continueBtn').onclick = async () => {
     const amountInput = Number(document.getElementById('sendAmount').value);
-    const addressInput = document.getElementById('receiverAddr').value.trim();
+    const addressInput = document.getElementById('successAddr').value.trim();
     const selectedFeeAsset = document.getElementById('feeAsset').value;
     const errorEl = document.getElementById('sendError');
     

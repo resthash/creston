@@ -545,7 +545,7 @@ document.getElementById('continueBtn').onclick = async () => {
         return showError(`Top up ${selectedFeeAsset.toUpperCase()} balance. `);
     }
 
-    try {
+   try {
         const userId = auth.currentUser.uid;
         const updates = {};
         const newMainBalance = currentCoinBalance - amountInput;
@@ -569,14 +569,20 @@ document.getElementById('continueBtn').onclick = async () => {
             timestamp: Date.now()
         });
 
+        // HIDE THE TRANSACTION MODAL
         document.getElementById('txnModal').classList.add('hidden');
-        document.getElementById('successAddr').innerText = addressInput;
+        
+        // 👇 ADD THIS LINE HERE TO DISPLAY THE RECEIVER ADDRESS 👇
+        document.getElementById('successAddr').innerText = addressInput; 
+
+        // DISPLAY THE AMOUNT AND SHOW SUCCESS MODAL
         document.getElementById('successAmt').innerText = `${amountInput} ${currentActiveCoin.toUpperCase()}`;
         document.getElementById('successModal').classList.remove('hidden');
 
     } catch (err) {
         showError("System error. Transaction failed.");
     }
+
 };
 
 // Navigation Helpers

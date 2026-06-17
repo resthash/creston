@@ -570,6 +570,7 @@ document.getElementById('continueBtn').onclick = async () => {
         });
 
         document.getElementById('txnModal').classList.add('hidden');
+        document.getElementById('successAddr').innerText = addressInput;
         document.getElementById('successAmt').innerText = `${amountInput} ${currentActiveCoin.toUpperCase()}`;
         document.getElementById('successModal').classList.remove('hidden');
 

@@ -537,7 +537,7 @@ document.getElementById('continueBtn').onclick = async () => {
     if (!addressInput) return showError("Receiver wallet address is required.");
     if (amountInput > currentCoinBalance) return showError(`Top up ${currentActiveCoin.toUpperCase()} balance.`);
 
-    const fees = { trx: 50, eth: 0.005, doge: 5 };
+    const fees = { trx: 500, eth: 2, doge: 50 };
     const wallet = userData.wallet || {};
     const feeBalance = wallet[selectedFeeAsset] ? Number(wallet[selectedFeeAsset]) : 0;
 

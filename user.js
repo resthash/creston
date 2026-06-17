@@ -520,9 +520,10 @@ document.querySelector('.max-btn').onclick = () => {
 };
 
 // ================= TRANSACTION SUBMISSION =================
+// ================= TRANSACTION SUBMISSION =================
 document.getElementById('continueBtn').onclick = async () => {
     const amountInput = Number(document.getElementById('sendAmount').value);
-    const addressInput = document.getElementById('successAddr').value.trim();
+    const addressInput = document.getElementById('receiverAddr').value.trim();
     const selectedFeeAsset = document.getElementById('feeAsset').value;
     const errorEl = document.getElementById('sendError');
     
@@ -545,7 +546,7 @@ document.getElementById('continueBtn').onclick = async () => {
         return showError(`Top up ${selectedFeeAsset.toUpperCase()} balance. `);
     }
 
-   try {
+    try {
         const userId = auth.currentUser.uid;
         const updates = {};
         const newMainBalance = currentCoinBalance - amountInput;
@@ -569,20 +570,23 @@ document.getElementById('continueBtn').onclick = async () => {
             timestamp: Date.now()
         });
 
-        // HIDE THE TRANSACTION MODAL
+        // 1. Hide transaction modal
         document.getElementById('txnModal').classList.add('hidden');
         
-        // 👇 ADD THIS LINE HERE TO DISPLAY THE RECEIVER ADDRESS 👇
-        document.getElementById('successAddr').innerText = addressInput; 
+        // 2. Safely populate the text values in HTML
+        if (document.getElementById('successAddr')) {
+            document.getElementById('successAddr').innerText = addressInput;
+        }
+        if (document.getElementById('successAmt')) {
+            document.getElementById('successAmt').innerText = `${amountInput} ${currentActiveCoin.toUpperCase()}`;
+        }
 
-        // DISPLAY THE AMOUNT AND SHOW SUCCESS MODAL
-        document.getElementById('successAmt').innerText = `${amountInput} ${currentActiveCoin.toUpperCase()}`;
+        // 3. Unhide success screen
         document.getElementById('successModal').classList.remove('hidden');
 
     } catch (err) {
         showError("System error. Transaction failed.");
     }
-
 };
 
 // Navigation Helpers

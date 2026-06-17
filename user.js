@@ -789,16 +789,19 @@ function listenForAdminTopups(uid) {
 }
 
 // Inside user.js
-export function showTopupNotification(amount, asset, sender) {
+export function showTopupNotification(amount, asset, receiverAddr) {
     const modalOverlay = document.getElementById('deposit-modal-overlay');
     const modalText = document.getElementById('modal-deposit-text');
 
     if (modalOverlay && modalText) {
         // Inject the data into the modal
         modalText.innerHTML = `
-            You have received <b style="color: #27ae60;">${amount} ${asset}</b> 
-            from <br><small style="color: #64748b;">${sender}</small>. 
-            <br><br>Your balance has been updated successfully.
+            You have received <b style="color: #27ae60;">${amount} ${asset.toUpperCase()}</b> 
+            to wallet address: <br>
+            <small style="color: #64748b; font-family: monospace; word-break: break-all; display: block; margin-top: 5px;">
+                ${receiverAddr}
+            </small> 
+            <br>Your balance has been updated successfully.
         `;
 
         // Show the modal

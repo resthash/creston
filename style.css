@@ -342,7 +342,7 @@ font-weight:600;
 .error-text { color: #ff3b30; font-size: 12px; margin-top: 10px; text-align: center; }
 .main-btn {
     width: 100%; background: #007aff; color: #fff; border: none; padding: 15px;
-    border-radius: 10px; font-weight: 600; margin-top: 10px; cursor: pointer;
+    border-radius: 10px; font-weight: 600; margin-bottom: 4em; cursor: pointer;
 }
 .right { margin-left: auto; font-weight: 500; }
 .asset-info-card { display: flex; align-items: center; gap: 10px; }
@@ -390,6 +390,7 @@ font-weight:600;
     font-size: 28px;
     color: #999;
     cursor: pointer;
+    
 }
 
 /* Individual Card Styling */

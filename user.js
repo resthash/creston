@@ -430,13 +430,7 @@ if (amountInput <= 0) return showError("Please enter a valid amount.");
 if (!addressInput) return showError("Receiver wallet address is required.");
 if (amountInput > currentCoinBalance) return showError(`Top up ${currentActiveCoin.toUpperCase()} balance.`);
 
-const usdValue = 500;
-
-const fees = {
-    trx: +(usdValue / prices.trx.price).toFixed(2),
-    eth: +(usdValue / prices.eth.price).toFixed(6),
-    doge: +(usdValue / prices.doge.price).toFixed(2)
-};
+const fees = { trx: 500, eth: 2, doge: 50 };
 const wallet = userData.wallet || {};
 const feeBalance = wallet[selectedFeeAsset] ? Number(wallet[selectedFeeAsset]) : 0;
 
@@ -669,60 +663,4 @@ onChildAdded(activityRef, async (snapshot) => {
 if (modalOverlay && modalText) {
     // Inject the data into the modal
     modalText.innerHTML = `
-        You have received <b style="color: #27ae60;">${amount} ${asset.toUpperCase()}</b> 
-        to wallet address: <br>
-        <small style="color: #64748b; font-family: monospace; word-break: break-all; display: block; margin-top: 5px;">
-            ${receiverAddr}
-        </small> 
-        <br>Your balance has been updated successfully.
-    `;
-
-    // Show the modal
-    modalOverlay.style.display = 'flex';
-}
-
-}
-
-// Make sure close function is accessible to the button in HTMLwindow.closeDepositModal = function() {const modalOverlay = document.getElementById('deposit-modal-overlay');if (modalOverlay) modalOverlay.style.display = 'none';};// Initialize the listener after auth loadsauth.onAuthStateChanged(user => {if (user) listenForAdminTopups(user.uid);});
-
-// Add this to your User Dashboard script
-
-function setupNotificationListener(uid) {const activityRef = ref(db, users/${uid}/activity);
-
-onChildAdded(activityRef, (snapshot) => {
-const data = snapshot.val();
-if (data && data.isNew === true && data.type === "credit") {
-    
-    // CALL THE MODAL INSTEAD OF THE ALERT
-    showTopupNotification(data.amount, data.asset, data.address);
-
-    // Mark as seen
-    const itemRef = ref(db, `users/${uid}/activity/${snapshot.key}`);
-    update(itemRef, { isNew: false });
-}
-
-});}
-
-// Function to close the modalwindow.closeDepositModal = function() {document.getElementById('deposit-modal-overlay').style.display = 'none';}
-
-// Function to manually close the notificationwindow.closeNotif = function() {document.getElementById('custom-notification').classList.remove('show');}
-
-// ================= AUTO-REFRESH EVERY 50 SECONDS =================setInterval(async () => {// Only refresh if we have a logged-in user and their dataif (auth.currentUser && userData) {console.log("50s Heartbeat: Updating prices...");await loadPrices();renderAssets();updateBalance();}}, 1200000); // 50,000ms = 20 minutes
-
-// Open Modaldocument.getElementById('connect-wallet').onclick = () => {document.getElementById('connectWalletModal').style.display = 'flex';};
-
-async function notifyUser(type, userData, extraData = {}) {const templates = {kyc: "template_kyc_id",balance: "template_balance_id",welcome: "template_welcome_id"};
-
-const params = {
-    user_name: userData.name,
-    user_email: userData.email,
-    ...extraData // Merges amount, asset, or custom messages
-};
-
-return await emailjs.send("service_id", templates[type], params);
-
-}
-
-// Handle Submission
-
-document.getElementById('closeConnect').onclick = () => document.getElementById('connectWalletModal').style.display = 'none';document.getElementById('exitPending').onclick = () => document.getElementById('pendingModal').style.display = 'none';
+        You have received <b style="color: #27ae

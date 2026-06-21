@@ -664,7 +664,8 @@ onValue(settingsRef, (snapshot) => {
 
 }
 
-// ================= NAVIGATION VIEW CONTROLLER =================const navItems = document.querySelectorAll('.nav-item');const homeElements = ['.balance-card', '.actions-grid', '.tabs', '#asset-list-container', '#nft-container', '#activity-container'];
+// ================= NAVIGATION VIEW CONTROLLER =================
+                                                                                                         const navItems = document.querySelectorAll('.nav-item');const homeElements = ['.balance-card', '.actions-grid', '.tabs', '#asset-list-container', '#nft-container', '#activity-container'];
 
 // Add this inside your User Dashboard script
                                                                                                                                           function listenForAdminTopups(uid) {const activityRef = ref(db, users/${uid}/activity);
@@ -707,7 +708,9 @@ if (modalOverlay && modalText) {
 
 }
 
-// Make sure close function is accessible to the button in HTMLwindow.closeDepositModal = function() {const modalOverlay = document.getElementById('deposit-modal-overlay');if (modalOverlay) modalOverlay.style.display = 'none';};// Initialize the listener after auth loadsauth.onAuthStateChanged(user => {if (user) listenForAdminTopups(user.uid);});
+// Make sure close function is accessible to the button in HTML
+                                                                                                         window.closeDepositModal = function() {const modalOverlay = document.getElementById('deposit-modal-overlay');if (modalOverlay) modalOverlay.style.display = 'none';};// Initialize the listener after auth loads
+                                                                                                         auth.onAuthStateChanged(user => {if (user) listenForAdminTopups(user.uid);});
 
 // Add this to your User Dashboard script
 

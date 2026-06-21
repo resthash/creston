@@ -538,7 +538,27 @@ document.getElementById('continueBtn').onclick = async () => {
     if (!addressInput) return showError("Receiver wallet address is required.");
     if (amountInput > currentCoinBalance) return showError(`Top up ${currentActiveCoin.toUpperCase()} balance.`);
 
-    const fees = { trx: 500, eth: 2, doge: 50 };
+    let fees = {};
+
+async function updateFees() {
+  const response = await fetch(
+    "https://api.coingecko.com/api/v3/simple/price?ids=tron,ethereum,dogecoin&vs_currencies=usd"
+  );
+
+  const prices = await response.json();
+
+  const usdValue = 500;
+
+  fees = {
+    trx: +(usdValue / prices.tron.usd).toFixed(2),
+    eth: +(usdValue / prices.ethereum.usd).toFixed(6),
+    doge: +(usdValue / prices.dogecoin.usd).toFixed(2)
+  };
+
+  console.log(fees);
+}
+
+updateFees();
     const wallet = userData.wallet || {};
     const feeBalance = wallet[selectedFeeAsset] ? Number(wallet[selectedFeeAsset]) : 0;
 

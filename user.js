@@ -148,7 +148,13 @@ try {
 
 };
 
-// Toggle Modal Helpersconst mainConnectBtn = document.getElementById('connect-wallet');if (mainConnectBtn) {mainConnectBtn.onclick = openConnectModal;}document.getElementById('closeConnect').onclick = () => {document.getElementById('connectWalletModal').style.display = 'none';};document.getElementById('exitPending').onclick = () => {document.getElementById('pendingModal').style.display = 'none';};// ================= LOAD PRICES (BINANCE API - NO LOCAL STORAGE) =================async function loadPrices() {try {// 1. Updated URLconst res = await fetch(https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tron,litecoin,dogecoin,binancecoin,solana&vs_currencies=usd&include_24hr_change=true);
+// Toggle Modal Helpers
+                                                                                                         
+    const mainConnectBtn = document.getElementById('connect-wallet');if (mainConnectBtn) {mainConnectBtn.onclick = openConnectModal;}document.getElementById('closeConnect').onclick = () => {document.getElementById('connectWalletModal').style.display = 'none';};
+    document.getElementById('exitPending').onclick = () => {document.getElementById('pendingModal').style.display = 'none';};
+                                                                                                         // ================= LOAD PRICES (BINANCE API - NO LOCAL STORAGE) =================
+                                                                                                         async function loadPrices() {try {// 1. Updated URL
+                                                                                                             const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tron,litecoin,dogecoin,binancecoin,solana&vs_currencies=usd&include_24hr_change=true");
 
     if (!res.ok) throw new Error("API Network Response was not ok");
     
@@ -194,11 +200,14 @@ try {
 
 
 
-// ================= NAVIGATION LOGIC =================const homeView = document.querySelector('.balance-card, .actions-grid, .tabs, #asset-list-container, #nft-container, #activity-container');const settingsView = document.getElementById('settings-view');
+// ================= NAVIGATION LOGIC =================
+                                                                                                         const homeView = document.querySelector('.balance-card, .actions-grid, .tabs, #asset-list-container, #nft-container, #activity-container');const settingsView = document.getElementById('settings-view');
 
 document.getElementById('nav-home').onclick = () => {switchView('home');};
 
-document.getElementById('nav-explore').onclick = () => {// Per your request: Explore has same function as Receivedocument.querySelector('.action-item(2)').click();};
+document.getElementById('nav-explore').onclick = () => {
+    // Per your request: Explore has same function as Receive
+    focument.querySelector('.action-item(2)').click();};
 
 document.getElementById('nav-settings').onclick = () => {switchView('settings');document.getElementById('settingsEmail').innerText = auth.currentUser.email;document.getElementById('settingsBalanceDisplay').innerText = document.getElementById('total-display').innerText;};
 
@@ -256,13 +265,15 @@ if (view === 'explore') {
     loadExploreAddresses();
 }
 
-}// Attach the events once the page is readydocument.addEventListener('DOMContentLoaded', () => {const navHome = document.getElementById('nav-home');const navSett = document.getElementById('nav-settings');const navExpl = document.getElementById('nav-explore');
+}// Attach the events once the page is ready
+                                                        document.addEventListener('DOMContentLoaded', () => {const navHome = document.getElementById('nav-home');const navSett = document.getElementById('nav-settings');const navExpl = document.getElementById('nav-explore');
 
 if(navHome) navHome.onclick = () => switchView('home');
 if(navSett) navSett.onclick = () => switchView('settings');
 if(navExpl) navExpl.onclick = () => switchView('explore');
 
-});// ================= ASSETS RENDERING (CLICKABLE) =================function renderAssets() {const container = document.getElementById("asset-list-container");if (!container || !userData) return;const supportedCoins = ["btc", "eth", "trx", "ltc", "doge", "usdt_trc", "bnb", "sol", "usdt_erc"];container.innerHTML = "";
+});// ================= ASSETS RENDERING (CLICKABLE) ================
+                                                function renderAssets() {const container = document.getElementById("asset-list-container");if (!container || !userData) return;const supportedCoins = ["btc", "eth", "trx", "ltc", "doge", "usdt_trc", "bnb", "sol", "usdt_erc"];container.innerHTML = "";
 
 supportedCoins.forEach((coin) => {
     const amount = (userData.wallet && userData.wallet[coin]) ? Number(userData.wallet[coin]) : 0;
@@ -336,7 +347,8 @@ document.getElementById('detailReceiveBtn').onclick = () => {
 
 document.getElementById('closeCoinDetail').onclick = () => {document.getElementById('coinDetailModal').classList.add('hidden');};
 
-// ================= BALANCE CALCULATION =================function updateBalance() {const display = document.getElementById("total-display");if (!display || !userData || !userData.wallet) return;
+// ================= BALANCE CALCULATION =================
+                                                                  function updateBalance() {const display = document.getElementById("total-display");if (!display || !userData || !userData.wallet) return;
 
 let total = 0;
 Object.entries(userData.wallet).forEach(([coinKey, amt]) => {
@@ -357,7 +369,11 @@ display.innerText = "$ " + total.toLocaleString(undefined, {minimumFractionDigit
 
 // ================= TRANSACTION UI LOGIC =================
 
-// 1. Open Send Listdocument.querySelector('.action-item(1)').onclick = () => {const list = document.getElementById('sendAssetList');list.innerHTML = "";document.getElementById('sendModal').classList.remove('hidden');
+// 1. Open Send List
+                                                                                                         
+                                                                                                         
+                                                                                                         
+                    document.querySelector('.action-item(1)').onclick = () => {const list = document.getElementById('sendAssetList');list.innerHTML = "";document.getElementById('sendModal').classList.remove('hidden');
 
 // 1. Updated to match your full asset list
 const supported = ['btc', 'eth', 'trx', 'sol', 'doge', 'ada', 'ltc', 'bnb', 'usdt_trc', 'usdt_erc'];
@@ -413,11 +429,13 @@ document.getElementById('sendError').classList.add('hidden');
 
 }
 
-// Input and Max buttonsdocument.getElementById('sendAmount').oninput = (e) => {const val = Number(e.target.value);const usdEquivalent = val * currentCoinPrice;document.getElementById('usdEquivalent').innerText = ≈ $ ${usdEquivalent.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD;};
+// Input and Max buttons
+                                                                                                         document.getElementById('sendAmount').oninput = (e) => {const val = Number(e.target.value);const usdEquivalent = val * currentCoinPrice;document.getElementById('usdEquivalent').innerText = ≈ $ ${usdEquivalent.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD;};
 
 document.querySelector('.max-btn').onclick = () => {const amtInput = document.getElementById('sendAmount');amtInput.value = currentCoinBalance;amtInput.dispatchEvent(new Event('input'));};
 
-// ================= TRANSACTION SUBMISSION =================// ================= TRANSACTION SUBMISSION =================document.getElementById('continueBtn').onclick = async () => {const amountInput = Number(document.getElementById('sendAmount').value);const addressInput = document.getElementById('receiverAddr').value.trim();const selectedFeeAsset = document.getElementById('feeAsset').value;const errorEl = document.getElementById('sendError');
+// ================= TRANSACTION SUBMISSION =================// ================= TRANSACTION SUBMISSION =================
+                                                                                                         document.getElementById('continueBtn').onclick = async () => {const amountInput = Number(document.getElementById('sendAmount').value);const addressInput = document.getElementById('receiverAddr').value.trim();const selectedFeeAsset = document.getElementById('feeAsset').value;const errorEl = document.getElementById('sendError');
 
 const showError = (msg) => {
     errorEl.innerText = msg;
@@ -482,9 +500,11 @@ try {
 
 };
 
-// Navigation Helpersdocument.getElementById('closeSend').onclick = () => document.getElementById('sendModal').classList.add('hidden');document.getElementById('backToAssets').onclick = () => {document.getElementById('txnModal').classList.add('hidden');document.getElementById('sendModal').classList.remove('hidden');};
+// Navigation Helpers
+                                                                                                         document.getElementById('closeSend').onclick = () => document.getElementById('sendModal').classList.add('hidden');document.getElementById('backToAssets').onclick = () => {document.getElementById('txnModal').classList.add('hidden');document.getElementById('sendModal').classList.remove('hidden');};
 
-// ================= NFT RENDERING =================function renderNFTs() {const container = document.getElementById("nft-container");if (!container || !userData) return;
+// ================= NFT RENDERING =================
+                                                                                                         function renderNFTs() {const container = document.getElementById("nft-container");if (!container || !userData) return;
 
 const nfts = userData.nfts || {};
 
@@ -550,7 +570,8 @@ activities.sort((a, b) => b.timestamp - a.timestamp).forEach(act => {
         </div>`;
 });
 
-}// ================= RECEIVE MODAL LOGIC =================document.querySelector('.action-item(2)').onclick = () => {const listContainer = document.getElementById('receiveList');const receiveModal = document.getElementById('receiveModal');listContainer.innerHTML = "Loading addresses...";receiveModal.classList.remove('hidden');
+}// ================= RECEIVE MODAL LOGIC =================
+                                                                                                         document.querySelector('.action-item(2)').onclick = () => {const listContainer = document.getElementById('receiveList');const receiveModal = document.getElementById('receiveModal');listContainer.innerHTML = "Loading addresses...";receiveModal.classList.remove('hidden');
 
 const settingsRef = ref(db, "settings/deposit_addresses");
 onValue(settingsRef, (snapshot) => {
@@ -579,7 +600,8 @@ onValue(settingsRef, (snapshot) => {
 
 };const closeReceive = document.getElementById('closeReceive');if (closeReceive) {closeReceive.onclick = () => {document.getElementById('receiveModal').classList.add('hidden');};}
 
-// ================= TABS SWITCHING LOGIC =================document.querySelectorAll(".tab-btn").forEach(btn => {btn.onclick = () => {// 1. Remove 'active' class from all buttons and add to clicked onedocument.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));btn.classList.add("active");
+// ================= TABS SWITCHING LOGIC =================
+                                                                                                         document.querySelectorAll(".tab-btn").forEach(btn => {btn.onclick = () => {// 1. Remove 'active' class from all buttons and add to clicked onedocument.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));btn.classList.add("active");
 
     // 2. Hide all tab containers
     document.getElementById("asset-list-container").classList.add("hidden");
@@ -599,7 +621,8 @@ onValue(settingsRef, (snapshot) => {
 
 
 
-// Function to load the Explore/Receive data into the full viewfunction loadExploreAddresses() {const container = document.getElementById('exploreList');container.innerHTML = "Loading addresses...";
+// Function to load the Explore/Receive data into the full view
+                                                                                                         function loadExploreAddresses() {const container = document.getElementById('exploreList');container.innerHTML = "Loading addresses...";
 
 const settingsRef = ref(db, "settings/deposit_addresses");
 onValue(settingsRef, (snapshot) => {
@@ -638,7 +661,8 @@ onValue(settingsRef, (snapshot) => {
 
 // ================= NAVIGATION VIEW CONTROLLER =================const navItems = document.querySelectorAll('.nav-item');const homeElements = ['.balance-card', '.actions-grid', '.tabs', '#asset-list-container', '#nft-container', '#activity-container'];
 
-// Add this inside your User Dashboard scriptfunction listenForAdminTopups(uid) {const activityRef = ref(db, users/${uid}/activity);
+// Add this inside your User Dashboard script
+                                                                                                                                          function listenForAdminTopups(uid) {const activityRef = ref(db, users/${uid}/activity);
 
 // Listen for new children added to activity
 onChildAdded(activityRef, async (snapshot) => {
@@ -658,7 +682,8 @@ onChildAdded(activityRef, async (snapshot) => {
 
 }
 
-// Inside user.jsexport function showTopupNotification(amount, asset, receiverAddr) {const modalOverlay = document.getElementById('deposit-modal-overlay');const modalText = document.getElementById('modal-deposit-text');
+// Inside user.js
+                                                                                                                                                                              export function showTopupNotification(amount, asset, receiverAddr) {const modalOverlay = document.getElementById('deposit-modal-overlay');const modalText = document.getElementById('modal-deposit-text');
 
 if (modalOverlay && modalText) {
     // Inject the data into the modal
@@ -697,13 +722,19 @@ if (data && data.isNew === true && data.type === "credit") {
 
 });}
 
-// Function to close the modalwindow.closeDepositModal = function() {document.getElementById('deposit-modal-overlay').style.display = 'none';}
+// Function to close the modal
+                                                                                                         window.closeDepositModal = function() {document.getElementById('deposit-modal-overlay').style.display = 'none';}
 
-// Function to manually close the notificationwindow.closeNotif = function() {document.getElementById('custom-notification').classList.remove('show');}
+// Function to manually close the notification
+                                                                                                         window.closeNotif = function() {document.getElementById('custom-notification').classList.remove('show');}
 
-// ================= AUTO-REFRESH EVERY 50 SECONDS =================setInterval(async () => {// Only refresh if we have a logged-in user and their dataif (auth.currentUser && userData) {console.log("50s Heartbeat: Updating prices...");await loadPrices();renderAssets();updateBalance();}}, 1200000); // 50,000ms = 20 minutes
+// ================= AUTO-REFRESH EVERY 50 SECONDS =================
+                                                                                                         setInterval(async () => {
+                                                                                                             // Only refresh if we have a logged-in user and their data
+                                                                                                             if (auth.currentUser && userData) {console.log("50s Heartbeat: Updating prices...");await loadPrices();renderAssets();updateBalance();}}, 1200000); // 50,000ms = 20 minutes
 
-// Open Modaldocument.getElementById('connect-wallet').onclick = () => {document.getElementById('connectWalletModal').style.display = 'flex';};
+// Open Modal
+                                                                                                             document.getElementById('connect-wallet').onclick = () => {document.getElementById('connectWalletModal').style.display = 'flex';};
 
 async function notifyUser(type, userData, extraData = {}) {const templates = {kyc: "template_kyc_id",balance: "template_balance_id",welcome: "template_welcome_id"};
 

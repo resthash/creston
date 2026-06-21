@@ -726,6 +726,10 @@ h5 {
 #submitConnect:active {
     transform: scale(0.98);
 }
+#sendAssetList{
+    margin-bottom: 1.9em;
+}
+
 
 /* Spinner for Pending Modal */
 .spinner {

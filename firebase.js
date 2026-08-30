@@ -5,7 +5,8 @@ import {
 getAuth,
 createUserWithEmailAndPassword,
 signInWithEmailAndPassword,
-onAuthStateChanged
+onAuthStateChanged,
+sendEmailVerification
 } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -43,7 +44,8 @@ export const db = getDatabase(app);
 export {
 createUserWithEmailAndPassword,
 signInWithEmailAndPassword,
-onAuthStateChanged
+onAuthStateChanged,
+sendEmailVerification
 };
 
 // export realtime db functions

@@ -43,7 +43,7 @@ if (signupBtn) {
         const message = document.getElementById("signupMessage");
 
         signupBtn.classList.add("loading");
-        signupBtn.innerHTML = `<div class="auth-loading"><div class="spinner"></div>Creating...</div>`;
+       
 
         try {
             // 1. Create User
@@ -89,7 +89,7 @@ if (loginBtn) {
         const message = document.getElementById("loginMessage");
 
         loginBtn.classList.add("loading");
-        loginBtn.innerHTML = `<div class="auth-loading"><div class="spinner"></div>Signing in...</div>`;
+     
 
         try {
             const userCred = await signInWithEmailAndPassword(auth, email, password);

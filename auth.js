@@ -1,55 +1,41 @@
 import {
-auth,
-db,
-createUserWithEmailAndPassword,
-signInWithEmailAndPassword,
-set,
-ref,
-onAuthStateChanged
+    auth,
+    db,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    sendEmailVerification,
+    set,
+    ref,
+    onAuthStateChanged
 } from "./firebase.js";
 
-
-
+// ================= TOGGLE VISIBILITY =================
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Get elements inside the loader
     const loginPass = document.getElementById("loginPassword");
     const toggleLogin = document.getElementById("toggleLoginPassword");
-
-    // 2. ONLY set the onclick if the element actually exists
     if (toggleLogin && loginPass) {
         toggleLogin.onclick = () => {
             const isPassword = loginPass.type === "password";
             loginPass.type = isPassword ? "text" : "password";
-            
-            // Swap icons (Make sure Font Awesome is linked in your <head>)
             toggleLogin.className = isPassword ? "fas fa-eye-slash" : "fas fa-eye";
         };
-    } else {
-        console.warn("Login password toggle elements not found on this page.");
     }
-});
-document.addEventListener("DOMContentLoaded", () => {
-    // 1. DEFINE the elements (Crucial Step)
+
     const signupPass = document.getElementById("signupPassword");
     const toggleSignup = document.getElementById("toggleSignupPassword");
-
-    // 2. CHECK if they exist before adding the click
     if (toggleSignup && signupPass) {
         toggleSignup.onclick = () => {
             const isPassword = signupPass.type === "password";
             signupPass.type = isPassword ? "text" : "password";
-            
-            // 3. TOGGLE the icon classes (Cleaner than using .innerHTML)
             toggleSignup.className = isPassword ? "fas fa-eye-slash" : "fas fa-eye";
         };
     }
 });
 
-
-// ================= SIGNUP =================
+// ================= SIGNUP WITH EMAIL VERIFICATION =================
 const signupBtn = document.getElementById("createAccountBtn");
 
-if (signupBtn) { // Safe guard check
+if (signupBtn) {
     signupBtn.onclick = async () => {
         const name = document.getElementById("signupName").value;
         const email = document.getElementById("signupEmail").value;
@@ -60,7 +46,10 @@ if (signupBtn) { // Safe guard check
         signupBtn.innerHTML = `<div class="auth-loading"><div class="spinner"></div>Creating...</div>`;
 
         try {
+            // 1. Create User
             const userCred = await createUserWithEmailAndPassword(auth, email, password);
+            
+            // 2. Save User Data to Realtime Database
             await set(ref(db, "users/" + userCred.user.uid), {
                 name: name,
                 email: email,
@@ -69,9 +58,18 @@ if (signupBtn) { // Safe guard check
                 activity: {}
             });
 
-            message.innerText = "Account created successfully";
+            // 3. Send Verification Email (OTP Link)
+            await sendEmailVerification(userCred.user);
+
+            // 4. Inform User and Sign Out (Prevent login until verified)
+            message.innerText = "Account created! Please check your email inbox to verify your account before logging in.";
             message.className = "auth-message success";
-            setTimeout(() => { window.location.href = "user.html"; }, 1500);
+            
+            // Sign out until they verify via the email link
+            await auth.signOut();
+
+            signupBtn.classList.remove("loading");
+            signupBtn.innerText = "Create account";
         } catch (err) {
             message.innerText = err.message;
             message.className = "auth-message error";
@@ -81,10 +79,10 @@ if (signupBtn) { // Safe guard check
     };
 }
 
-// ================= LOGIN =================
+// ================= LOGIN WITH EMAIL VERIFICATION CHECK =================
 const loginBtn = document.getElementById("loginBtn");
 
-if (loginBtn) { // Safe guard check
+if (loginBtn) {
     loginBtn.onclick = async () => {
         const email = document.getElementById("loginEmail").value;
         const password = document.getElementById("loginPassword").value;
@@ -94,7 +92,19 @@ if (loginBtn) { // Safe guard check
         loginBtn.innerHTML = `<div class="auth-loading"><div class="spinner"></div>Signing in...</div>`;
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCred = await signInWithEmailAndPassword(auth, email, password);
+            
+            // Check if email has been verified
+            if (!userCred.user.emailVerified) {
+                message.innerText = "Please verify your email address before signing in. Check your inbox.";
+                message.className = "auth-message error";
+                
+                await auth.signOut();
+                loginBtn.classList.remove("loading");
+                loginBtn.innerText = "Sign in";
+                return;
+            }
+
             message.innerText = "Login successful";
             message.className = "auth-message success";
             setTimeout(() => { window.location.href = "user.html"; }, 1000);
@@ -107,26 +117,22 @@ if (loginBtn) { // Safe guard check
     };
 }
 
-// ================= THE FINAL ADMIN GATE =================
+// ================= ADMIN & ROUTE GUARD =================
 onAuthStateChanged(auth, (user) => {
-    // 1. Check if user exists
     if (!user) {
         console.log("Auth: No user logged in.");
         return;
     }
 
-    // 2. Check if user is admin
+    // Block unverified users if they attempt to access user pages directly
+    if (!user.emailVerified) {
+        auth.signOut();
+        return;
+    }
+
     const adminEmails = ["unveilingnight@gmail.com", "revoutpay@gmail.com"];
     const isAdmin = adminEmails.includes(user.email.toLowerCase());
-    
-    // 3. Check if we are on the dashboard
     const isDashboard = document.getElementById('balanceCard') !== null;
-
-    console.log("Auth Status:", { 
-        email: user.email, 
-        isAdmin: isAdmin, 
-        onDashboard: isDashboard 
-    });
 
     if (isAdmin && isDashboard) {
         if (!document.getElementById('adminLink')) {
@@ -136,11 +142,10 @@ onAuthStateChanged(auth, (user) => {
             Object.assign(btn.style, {
                 position: 'fixed', bottom: '20px', right: '20px',
                 background: '#e11d48', color: 'white', padding: '12px',
-                borderRadius: '8px', zIndex: '9999', cursor: 'pointer', display: 'none'
+                borderRadius: '8px', zIndex: '9999', cursor: 'pointer'
             });
             btn.onclick = () => window.location.href = "admin.html";
             document.body.appendChild(btn);
-            console.log("SUCCESS: Admin button injected.");
         }
     }
 });

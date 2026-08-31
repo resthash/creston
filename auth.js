@@ -61,7 +61,6 @@ const message = document.getElementById("signupMessage")
 signupBtn.classList.add("loading")
 signupBtn.innerHTML =
 `<div class="auth-loading">
-<div class="spinner"></div>
 Creating...
 </div>`
 
@@ -116,7 +115,6 @@ const message = document.getElementById("loginMessage")
 loginBtn.classList.add("loading")
 loginBtn.innerHTML =
 `<div class="auth-loading">
-<div class="spinner"></div>
 Signing in...
 </div>`
 
